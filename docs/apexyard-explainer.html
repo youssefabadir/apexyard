@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ApexYard — How to use it, and the best way to use it</title>
+<meta name="description" content="A reference explainer for ApexYard — a multi-project ops framework for AI coding agents.">
+<style>
+:root[data-theme="light"] {
+  --bg:#fff; --bg-soft:#f7f8fa; --bg-code:#f5f6f8; --bg-code-header:#eceef2;
+  --border:#e3e6ea; --border-strong:#cdd2d8; --text:#1d2329; --text-soft:#4a525b; --text-mute:#6b7480;
+  --accent:#2f6df6; --accent-soft:#eaf0fe; --green:#1a8455; --green-soft:#e6f4ef;
+  --red:#c2410c; --red-soft:#fdeee4; --amber:#946a13; --amber-soft:#fdf6e3;
+}
+:root[data-theme="dark"] {
+  --bg:#0f1318; --bg-soft:#161b22; --bg-code:#11151b; --bg-code-header:#1c2230;
+  --border:#232932; --border-strong:#353c47; --text:#e6e9ee; --text-soft:#b3bac4; --text-mute:#8a929c;
+  --accent:#6b9cff; --accent-soft:#1a2540; --green:#4ad99a; --green-soft:#11271d;
+  --red:#ff8c66; --red-soft:#2a1610; --amber:#ffc849; --amber-soft:#2a210a;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-theme="auto"] {
+    --bg:#0f1318; --bg-soft:#161b22; --bg-code:#11151b; --bg-code-header:#1c2230;
+    --border:#232932; --border-strong:#353c47; --text:#e6e9ee; --text-soft:#b3bac4; --text-mute:#8a929c;
+    --accent:#6b9cff; --accent-soft:#1a2540; --green:#4ad99a; --green-soft:#11271d;
+    --red:#ff8c66; --red-soft:#2a1610; --amber:#ffc849; --amber-soft:#2a210a;
+  }
+}
+:root {
+  --font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --font-mono:"SFMono-Regular",ui-monospace,"Menlo","Consolas","Liberation Mono",monospace;
+  --max:1200px; --side:240px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+header.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:12px 28px;background:var(--bg);border-bottom:1px solid var(--border)}
+header.topbar .brand{font-weight:700;font-size:15px;letter-spacing:-.01em}
+header.topbar .brand a{color:var(--text);text-decoration:none}
+header.topbar .brand .accent{color:var(--accent)}
+header.topbar .top-actions{display:flex;gap:8px;align-items:center}
+header.topbar .top-actions a{color:var(--text-soft);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px}
+header.topbar .top-actions a:hover{background:var(--bg-soft);color:var(--text)}
+.theme-toggle{background:var(--bg-soft);border:1px solid var(--border);color:var(--text-soft);padding:6px 10px;border-radius:6px;cursor:pointer;font-size:13px;font-family:var(--font-sans)}
+.theme-toggle:hover{color:var(--text);border-color:var(--border-strong)}
+.layout{display:grid;grid-template-columns:var(--side) 1fr;max-width:var(--max);margin:0 auto}
+nav.toc{position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;padding:24px 16px 60px;font-size:14px;align-self:start;border-right:1px solid var(--border)}
+nav.toc h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-mute);margin:0 0 8px 8px;font-weight:600}
+nav.toc ol{list-style:none;padding:0;margin:0 0 24px}
+nav.toc ol li{margin:0}
+nav.toc a{display:block;padding:5px 10px;color:var(--text-soft);text-decoration:none;border-radius:6px;line-height:1.45;border-left:2px solid transparent}
+nav.toc a:hover{background:var(--bg-soft);color:var(--text)}
+nav.toc a.active{color:var(--accent);background:var(--accent-soft);border-left-color:var(--accent);font-weight:500}
+nav.toc .toc-meta{margin-top:28px;padding:12px;border-radius:8px;background:var(--bg-soft);font-size:12px;color:var(--text-mute)}
+nav.toc .toc-meta b{color:var(--text-soft)}
+main{padding:0 36px 120px;max-width:calc(var(--max) - var(--side) - 72px)}
+@media (max-width:980px){.layout{grid-template-columns:1fr} nav.toc{display:none} main{padding:0 22px 80px;max-width:100%}}
+section{padding-top:44px;padding-bottom:8px;scroll-margin-top:70px}
+section:first-of-type{padding-top:24px}
+h1{font-size:38px;line-height:1.15;letter-spacing:-.025em;margin:0 0 12px;font-weight:700}
+h2{font-size:26px;letter-spacing:-.015em;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid var(--border);font-weight:700}
+h3{font-size:19px;letter-spacing:-.01em;margin:28px 0 10px;font-weight:600}
+h4{font-size:15px;margin:22px 0 8px;font-weight:600;color:var(--text-soft)}
+p{margin:0 0 14px}
+p,li{font-size:15.5px}
+ul,ol{padding-left:22px}
+li{margin:4px 0}
+strong{color:var(--text);font-weight:600}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+code{font-family:var(--font-mono);font-size:.88em;background:var(--bg-soft);padding:1.5px 5px;border-radius:4px;color:var(--text);border:1px solid var(--border)}
+hr{border:none;border-top:1px solid var(--border);margin:36px 0}
+.subtitle{font-size:20px;color:var(--text-soft);margin:0 0 20px;font-weight:400;line-height:1.4}
+.hero{padding:50px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.hero .eyebrow{font-size:13px;color:var(--accent);font-weight:600;letter-spacing:.04em;margin-bottom:14px;text-transform:uppercase}
+.hero .lead{font-size:18px;color:var(--text-soft);max-width:760px;line-height:1.55}
+.stats{display:flex;flex-wrap:wrap;gap:10px;margin:24px 0 6px}
+.stat{background:var(--bg-soft);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:13px;color:var(--text-soft)}
+.stat b{color:var(--text);font-weight:600}
+.callout{padding:14px 16px;border-radius:8px;margin:18px 0;border-left:3px solid var(--accent);background:var(--accent-soft);font-size:14.5px}
+.callout.green{border-left-color:var(--green);background:var(--green-soft)}
+.callout.amber{border-left-color:var(--amber);background:var(--amber-soft)}
+.callout.red{border-left-color:var(--red);background:var(--red-soft)}
+.callout .c-title{font-weight:600;margin-bottom:4px;color:var(--text)}
+.callout p:last-child{margin-bottom:0}
+.codeblock{margin:16px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg-code)}
+.codeblock .code-header{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:var(--bg-code-header);border-bottom:1px solid var(--border);font-size:12px;color:var(--text-mute);font-family:var(--font-mono)}
+.codeblock .code-header .lang{font-weight:600}
+.codeblock pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--font-mono);font-size:13px;line-height:1.55;color:var(--text)}
+.codeblock pre code{background:none;border:none;padding:0;font-size:inherit}
+.copy-btn{background:transparent;border:1px solid var(--border);color:var(--text-mute);padding:3px 9px;border-radius:5px;cursor:pointer;font-size:11px;font-family:var(--font-sans)}
+.copy-btn:hover{color:var(--text);border-color:var(--border-strong);background:var(--bg-soft)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+.inline-cmd{font-family:var(--font-mono);font-size:.92em;background:var(--bg-soft);padding:1px 6px;border-radius:4px;border:1px solid var(--border);color:var(--text)}
+.tbl-wrap{overflow-x:auto;margin:16px 0 22px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+table th,table td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+table th{background:var(--bg-soft);font-weight:600;color:var(--text-soft);font-size:13px;white-space:nowrap}
+table tbody tr:hover td{background:var(--bg-soft)}
+.tbl-compact td,.tbl-compact th{padding:6px 10px;font-size:13px}
+.pill{display:inline-block;padding:2px 9px;border-radius:12px;font-size:12px;font-weight:500;background:var(--bg-soft);color:var(--text-soft);border:1px solid var(--border)}
+.pill.accent{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.pill.green{background:var(--green-soft);color:var(--green);border-color:transparent}
+.pill.amber{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.pill.red{background:var(--red-soft);color:var(--red);border-color:transparent}
+.grid{display:grid;gap:14px;margin:18px 0}
+.grid.cols-2{grid-template-columns:1fr 1fr}
+.grid.cols-3{grid-template-columns:repeat(3,1fr)}
+.grid.cols-4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:760px){.grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr}}
+.card{border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--bg)}
+.card h4{margin-top:0}
+.card p{font-size:14px;color:var(--text-soft);margin-bottom:0}
+.card .card-num{font-size:12px;color:var(--accent);font-weight:600;margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.layer-stack{display:grid;gap:0;margin:24px 0}
+.layer-row{display:grid;grid-template-columns:130px 1fr;gap:14px;align-items:stretch}
+.layer-row+.layer-row{margin-top:8px}
+.layer-label{display:flex;flex-direction:column;justify-content:center;padding:14px;border-radius:8px 0 0 8px;border:1px solid var(--border);border-right:none;background:var(--bg-soft)}
+.layer-label .l-name{font-weight:600;font-size:14px}
+.layer-label .l-meta{font-size:11.5px;color:var(--text-mute);margin-top:2px}
+.layer-body{padding:14px 16px;border:1px solid var(--border);border-radius:0 8px 8px 0;background:var(--bg)}
+.layer-body p{margin:0;font-size:14px;color:var(--text-soft)}
+.layer-body .l-tags{margin-top:6px}
+@media (max-width:600px){.layer-row{grid-template-columns:1fr} .layer-label{border-radius:8px 8px 0 0;border:1px solid var(--border);border-bottom:none} .layer-body{border-radius:0 0 8px 8px}}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:0;margin:22px 0}
+.flow .node{flex:1 1 0;min-width:100px;padding:10px 8px;text-align:center;background:var(--bg-soft);border:1px solid var(--border);font-size:13px;font-weight:500;border-radius:6px}
+.flow .node .num{display:block;font-size:11px;color:var(--accent);font-weight:600;margin-bottom:2px}
+.flow .arrow{display:flex;align-items:center;padding:0 4px;color:var(--text-mute);font-size:16px}
+.flow .arrow::before{content:"→"}
+@media (max-width:760px){.flow{flex-direction:column} .flow .arrow{transform:rotate(90deg);padding:6px 0;justify-content:center}}
+details.collapsible{margin:16px 0;border:1px solid var(--border);border-radius:8px;background:var(--bg-soft)}
+details.collapsible > summary{cursor:pointer;padding:12px 16px;font-weight:600;font-size:15px;list-style:none;display:flex;align-items:center;gap:8px;color:var(--text)}
+details.collapsible > summary::-webkit-details-marker{display:none}
+details.collapsible > summary::before{content:"▸";color:var(--accent);transition:transform .15s;font-size:14px;display:inline-block}
+details.collapsible[open] > summary::before{transform:rotate(90deg)}
+details.collapsible > summary:hover{background:var(--bg);border-radius:8px 8px 0 0}
+details.collapsible > div.collapsible-body{padding:0 16px 16px}
+details.collapsible > div.collapsible-body > *:first-child{margin-top:0}
+.tabs{margin:18px 0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tab-bar{display:flex;background:var(--bg-code-header);border-bottom:1px solid var(--border)}
+.tab-bar button{background:transparent;border:none;padding:9px 16px;cursor:pointer;font-family:var(--font-sans);font-size:13px;color:var(--text-mute);border-bottom:2px solid transparent;font-weight:500}
+.tab-bar button:hover{color:var(--text);background:var(--bg-soft)}
+.tab-bar button.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg-code)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.tab-panel .codeblock{border:none;border-radius:0;margin:0}
+.mark-line{font-family:var(--font-mono);font-size:13px;padding:8px 12px;background:var(--bg-soft);border-left:3px solid var(--accent);border-radius:4px;margin:12px 0;color:var(--text)}
+footer{text-align:center;padding:40px 0 30px;color:var(--text-mute);font-size:13px;border-top:1px solid var(--border)}
+footer a{color:var(--text-soft)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><a href="#top"><span class="accent">▸</span> ApexYard explainer</a></div>
+  <div class="top-actions">
+    <a href="https://github.com/me2resh/apexyard">GitHub ↗</a>
+    <a href="https://yard.apexscript.com">yard.apexscript.com ↗</a>
+    <button class="theme-toggle" onclick="toggleTheme()">☾ Dark</button>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="toc" aria-label="Table of contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#what">What ApexYard is</a></li>
+    <li><a href="#problem">The problem it solves</a></li>
+    <li><a href="#model">Mental model</a></li>
+    <li><a href="#layers">The 5-layer architecture</a></li>
+    <li><a href="#quickstart">Quick start</a></li>
+    <li><a href="#sdlc">The SDLC it enforces</a></li>
+    <li><a href="#walkthrough">End-to-end walkthrough</a></li>
+    <li><a href="#skills">Skills (slash commands)</a></li>
+    <li><a href="#hooks">Hooks (mechanical gates)</a></li>
+    <li><a href="#agents">Agents &amp; roles</a></li>
+    <li><a href="#templates">Templates</a></li>
+    <li><a href="#agdr">AgDRs (decision memory)</a></li>
+    <li><a href="#handbooks">Handbooks</a></li>
+    <li><a href="#pipelines">CI pipelines &amp; topologies</a></li>
+    <li><a href="#best">The best way to use it</a></li>
+    <li><a href="#upgrading">Upgrading &amp; community</a></li>
+  </ol>
+  <div class="toc-meta"><b>Reading time</b>: ~25 min top-to-bottom. Use the sidebar as a reference once you're set up.</div>
+</nav>
+
+<main>
+<div id="top"></div>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="what">
+  <div class="eyebrow">ApexYard v4.3.0 · MIT · multi-project ops framework</div>
+  <h1>Ship AI-built software<br>like a real engineering team.</h1>
+  <p class="lead">ApexYard is a fork-based <strong>ops repo</strong> that governs a portfolio of projects under a strict SDLC. You don't add it to a project — projects get forged <em>inside</em> it. Claude Code is the default driver, but the rules, hooks, and templates are plain markdown and shell. Swap the AI. Keep the forge.</p>
+  <div class="stats">
+    <span class="stat"><b>63</b> slash-command skills</span>
+    <span class="stat"><b>~30</b> mechanical shell hooks</span>
+    <span class="stat"><b>23</b> sub-agents</span>
+    <span class="stat"><b>20</b> role personas</span>
+    <span class="stat"><b>81</b> AgDRs</span>
+    <span class="stat"><b>11</b> CI pipeline templates</span>
+    <span class="stat"><b>3</b> topology bundles</span>
+  </div>
+  <p style="font-size:14px;color:var(--text-mute);margin-top:18px;">Proven shipping TypeScript + AWS Lambda backends, Next.js web apps, Chrome extensions, and native Swift macOS desktop apps. The stack is process and guardrails — not a language or framework lock-in.</p>
+</section>
+
+<!-- ===================== PROBLEM ===================== -->
+<section id="problem">
+  <h2>The problem it solves</h2>
+  <p>Claude Code is powerful, but without structure it produces inconsistent results. Every team reinvents the same processes — role definitions, review checklists, document templates, workflow gates. ApexYard provides that structure as a reusable, open-source stack: one config file to customise, 20 role definitions to use, battle-tested workflows to follow, and ~30 shell hooks that enforce the rules <em>mechanically</em>.</p>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Feature</th><th>Without ApexYard</th><th>With ApexYard</th></tr></thead>
+      <tbody>
+        <tr><td>Code reviews</td><td>Ad-hoc prompts</td><td>Rex agent on every PR, SHA-bound approval marker</td></tr>
+        <tr><td>Technical decisions</td><td>Lost in chat history</td><td>Documented as <strong>Agent Decision Records</strong> (AgDRs)</td></tr>
+        <tr><td>Quality gates</td><td>Hope and pray</td><td>~30 shell hooks block bad commits, forged markers, unreviewed merges</td></tr>
+        <tr><td>Merge approval</td><td>Informal "LGTM"</td><td><strong>Two-marker gate</strong> — Rex (code) + CEO (per-PR explicit)</td></tr>
+        <tr><td>Database migrations</td><td>Drop-column-on-Friday</td><td>Dedicated gate: labelled ticket + migration AgDR (rollback, downtime, consumers) required before schema edits</td></tr>
+        <tr><td>Architecture docs</td><td>Nobody draws them</td><td>C4 L1 + L2 Mermaid templates + <code class="inline-cmd">/c4</code> skill generates stubs from a codebase</td></tr>
+        <tr><td>Portfolio visibility</td><td>Tab through 5 GitHubs</td><td><code class="inline-cmd">/inbox</code>, <code class="inline-cmd">/status</code>, <code class="inline-cmd">/tasks</code> aggregate across a single registry file</td></tr>
+        <tr><td>Upstream sync</td><td>Forget for 6 months</td><td>Session-start drift banner + <code class="inline-cmd">/update</code> skill walks a per-version migration chain</td></tr>
+        <tr><td>Onboarding</td><td>Days of context-setting</td><td><code class="inline-cmd">/setup</code> three-exchange config</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout green">
+    <div class="c-title">Who it's for</div>
+    <p>Founders who ship alone, or companies standing up AI-enabled squads. If you're tired of re-explaining your SDLC to the model every session, and tired of merges you can't audit, ApexYard is built for you.</p>
+  </div>
+</section>
+
+<!-- ===================== MENTAL MODEL ===================== -->
+<section id="model">
+  <h2>Mental model — one ops repo, many projects</h2>
+  <p>You fork <code class="inline-cmd">me2resh/apexyard</code> into your org. The fork <em>is</em> your ops repo. A single registry file at its root lists every project under management. Per-project docs live in <code class="inline-cmd">projects/&lt;name&gt;/</code>; optional live working copies live in <code class="inline-cmd">workspace/&lt;name&gt;/</code> (gitignored). Skills like <code class="inline-cmd">/projects</code>, <code class="inline-cmd">/inbox</code>, <code class="inline-cmd">/status</code>, <code class="inline-cmd">/tasks</code> aggregate across the registry — even if you only have one repo.</p>
+
+  <div class="grid cols-2">
+    <div class="card">
+      <div class="card-num">workspace/&lt;name&gt;/</div>
+      <h4>Live working copies — gitignored</h4>
+      <p>Real git clones of your managed projects. Branches, PRs, and CI happen here. Gitignored in your fork because each project has its own remote.</p>
+    </div>
+    <div class="card">
+      <div class="card-num">projects/&lt;name&gt;/</div>
+      <h4>ApexYard docs per project — committed</h4>
+      <p>Roadmaps, handover assessments, stakeholder updates, architecture diagrams. Committed to your fork (or your private sibling repo) alongside the registry.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="c-title">The "where does this doc go?" test</div>
+    <p><em>Would I want this to follow the code if the project was spun out tomorrow?</em> If yes → put it in the project's own repo (<code class="inline-cmd">workspace/&lt;name&gt;/docs/</code>). If no → put it in <code class="inline-cmd">projects/&lt;name&gt;/</code> in your fork.</p>
+  </div>
+
+  <h3>Two setup modes — pick before you fork</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th></th><th>Single-fork (default)</th><th>Split-portfolio v2</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Repos</strong></td><td>One — your fork of apexyard</td><td>Two — public fork + a private sibling repo for the portfolio</td></tr>
+        <tr><td><strong>Registry lives in</strong></td><td>The fork root</td><td>The private sibling repo, resolved via a <code class="inline-cmd">portfolio:</code> config block</td></tr>
+        <tr><td><strong>Public exposure</strong></td><td>Project names + handover findings are on a public GitHub repo</td><td>Public fork holds only framework files; portfolio data stays private</td></tr>
+        <tr><td><strong>Pick if…</strong></td><td>All your projects are already public, OR you have GitHub Pro/Team/Enterprise (supports private forks)</td><td>You're on GitHub Free with any project you don't want named publicly</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber">
+    <div class="c-title">The trip-wire</div>
+    <p>GitHub Free disallows changing a fork's visibility — you can't make a fork of a public repo private after the fact. If you have any private project and you're on the free tier, start in split-portfolio mode. The <code class="inline-cmd">/split-portfolio</code> skill automates the migration if you've already pushed private names to a public fork.</p>
+  </div>
+</section>
+
+<!-- ===================== 5-LAYER ARCH ===================== -->
+<section id="layers">
+  <h2>The 5-layer <code class="inline-cmd">.claude/</code> architecture</h2>
+  <p>ApexYard ships a <code class="inline-cmd">.claude/</code> directory that turns the markdown content into a runnable workflow. Claude Code picks it up automatically when the directory lives at the project root. Five layers, each loaded differently, each enforced differently.</p>
+
+  <div class="layer-stack">
+    <div class="layer-row">
+      <div class="layer-label"><div class="l-name">Skills</div><div class="l-meta">63 slash commands</div></div>
+      <div class="layer-body">
+        <p>One <code class="inline-cmd">SKILL.md</code> per subdirectory. Each is a markdown runbook the agent drives in-thread when you type <code class="inline-cmd">/&lt;name&gt;</code>. Examples: <code class="inline-cmd">/setup</code>, <code class="inline-cmd">/handover</code>, <code class="inline-cmd">/start-ticket</code>, <code class="inline-cmd">/approve-merge</code>, <code class="inline-cmd">/release</code>.</p>
+        <div class="l-tags"><span class="pill">loaded by</span> slash command, invoked by user or model</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-label"><div class="l-name">Hooks</div><div class="l-meta">~30 shell scripts</div></div>
+      <div class="layer-body">
+        <p>Wired to <code class="inline-cmd">PreToolUse</code>, <code class="inline-cmd">PostToolUse</code>, <code class="inline-cmd">SessionStart</code>, and <code class="inline-cmd">UserPromptSubmit</code> events in <code class="inline-cmd">settings.json</code>. Each returns <code class="inline-cmd">exit 0</code> (allow) or <code class="inline-cmd">exit 2</code> (block with a <code class="inline-cmd">BLOCKED: ...</code> message + unblock recipe).</p>
+        <div class="l-tags"><span class="pill">exit 0</span> allow &nbsp; <span class="pill red">exit 2</span> block</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-label"><div class="l-name">Agents</div><div class="l-meta">23 sub-agents</div></div>
+      <div class="layer-body">
+        <p>Markdown persona wrappers spawned via the Agent tool. Own the model tier (<code class="inline-cmd">opus</code>/<code class="inline-cmd">sonnet</code>/<code class="inline-cmd">haiku</code>) and tool allow/deny list per role. Rex (code-reviewer), Hakim (security), Tariq (solution architect), Munir (deps), Idris (tickets), Naqid (contrarian).</p>
+        <div class="l-tags"><span class="pill">isolated-work-class</span> spawn sub-agent &nbsp; <span class="pill">in-flow-class</span> adopt in-thread</div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-label"><div class="l-name">Rules</div><div class="l-meta">12 markdown files</div></div>
+      <div class="layer-body">
+        <p>Plain markdown imported into <code class="inline-cmd">CLAUDE.md</code> via the <code class="inline-cmd">@.claude/rules/*</code> directive. Advisory by default; backed by a matching hook where one exists. Examples: <code class="inline-cmd">workflow-gates.md</code>, <code class="inline-cmd">role-triggers.md</code>, <code class="inline-cmd">pr-workflow.md</code>.</p>
+        <div class="l-tags"><span class="pill">imported</span> <code class="inline-cmd">@.claude/rules/&lt;name&gt;.md</code></div>
+      </div>
+    </div>
+    <div class="layer-row">
+      <div class="layer-label"><div class="l-name">Session</div><div class="l-meta">gitignored runtime state</div></div>
+      <div class="layer-body">
+        <p>Per-machine markers at <code class="inline-cmd">.claude/session/</code>: active tickets, review approvals, bootstrap-skill flag. Written by skills + agents, read by hooks. Never committed. This is the mechanical substrate the gates read/write to.</p>
+        <div class="l-tags"><span class="pill">tickets/</span> <span class="pill">reviews/</span> <span class="pill">active-bootstrap</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="c-title">Why shell hooks matter</div>
+    <p>Rules in markdown are advisory — the model can drift. Hooks are mechanical: a script returning <code class="inline-cmd">exit 2</code> blocks the tool call <em>before it happens</em>, no matter what the model "decided". The framework's design principle is <strong>fail-open on tooling, fail-closed on policy</strong>: a missing <code class="inline-cmd">jq</code> degrades gracefully; a missing ticket marker hard-blocks the edit.</p>
+  </div>
+
+  <details class="collapsible">
+    <summary>The full session-state surface</summary>
+    <div class="collapsible-body">
+      <p>Every marker file the framework reads or writes under <code class="inline-cmd">.claude/session/</code>:</p>
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">.claude/session/</span></div>
+        <pre><code>tickets/&lt;project&gt;                        # Tier 1 per-project marker (a FILE)
+tickets/&lt;project&gt;/&lt;safe-branch&gt;           # Tier 0 per-worktree marker (parallel agents)
+current-ticket                            # Tier 2 ops-fallback marker (framework edits)
+active-bootstrap                          # one-line marker naming the running bootstrap skill
+active-issue-skill                        # marker for the active issue-filing skill
+reviews/&lt;owner&gt;__&lt;repo&gt;__&lt;pr&gt;-rex.approved  # bare-SHA marker written by Rex on APPROVED
+reviews/&lt;owner&gt;__&lt;repo&gt;__&lt;pr&gt;-ceo.approved   # structured marker written ONLY by /approve-merge
+reviews/&lt;pr&gt;-architecture.approved          # Solution Architect sign-off (Tariq)</code></pre>
+      </div>
+      <p>All review markers are repo-qualified as of AgDR-0060 so the same PR number in two repos never collides.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ===================== QUICK START ===================== -->
+<section id="quickstart">
+  <h2>Quick start — fork and go</h2>
+
+  <div class="tabs" id="qs-tabs">
+    <div class="tab-bar">
+      <button class="active" data-tab="easy">Easy way — skills drive it</button>
+      <button data-tab="manual">Manual way — shell commands</button>
+    </div>
+    <div class="tab-panel active" data-panel="easy">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">bash</span></div>
+        <pre><code># 1. Fork on GitHub, then clone your fork locally
+gh repo fork me2resh/apexyard --clone
+cd apexyard
+
+# 2. Add upstream so you can pull future updates
+git remote add upstream https://github.com/me2resh/apexyard.git
+
+# 3. Configure the framework — run /setup inside Claude Code.
+#    Three exchanges: describe stack → review defaults → accept or tweak.
+#    It writes onboarding.yaml (gitignored), seeds the registry, optionally
+#    installs the LSP plugin for your detected language.
+/setup
+
+# 4. Register a project — run /handover
+#    Clones the repo, scores harnessability across 5 dimensions,
+#    seeds per-project docs, and registers it in apexyard.projects.yaml.
+/handover https://github.com/your-org/example-app
+
+# 5. Start working
+/projects    # list every managed project + status
+/inbox       # PRs, issues, comments needing your attention
+/status      # git + CI snapshot per project
+/tasks       # actionable task list with direct URLs</code></pre>
+      </div>
+    </div>
+    <div class="tab-panel" data-panel="manual">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">bash</span></div>
+        <pre><code># 1. Fork on GitHub, then clone your fork locally
+gh repo fork me2resh/apexyard --clone
+cd apexyard
+
+# 2. Add upstream so you can pull future updates
+git remote add upstream https://github.com/me2resh/apexyard.git
+
+# 3. Configure — copy the tracked placeholder template (onboarding.yaml
+#    is gitignored; a commit-time guard blocks a filled-in copy)
+cp onboarding.example.yaml onboarding.yaml
+$EDITOR onboarding.yaml     # set company, team, tech stack, quality bar
+
+# 4. Create the registry
+cp apexyard.projects.yaml.example apexyard.projects.yaml
+$EDITOR apexyard.projects.yaml
+
+# 5. Seed per-project docs (one folder per project)
+mkdir -p projects/example-app
+echo "# example-app" > projects/example-app/README.md
+
+# 6. (Optional) clone the project into workspace/ for code-review deep-dives
+git clone https://github.com/your-org/example-app workspace/example-app
+
+# Verify
+/projects   # should show one row per registered project
+/inbox
+/status</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <p>The minimal registry entry is four lines:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">yaml — apexyard.projects.yaml</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>version: 1
+projects:
+  - name: example-app
+    repo: your-org/example-app
+    docs: projects/example-app
+    status: active</code></pre>
+  </div>
+
+  <div class="callout green">
+    <div class="c-title">You don't need a CLI to use ApexYard</div>
+    <p>The framework's primary UX is slash-commands inside Claude Code. The shell CLI is intentionally tiny — one command today, <code class="inline-cmd">apexyard status</code>, delegating to <code class="inline-cmd">.claude/skills/status/briefing.sh</code>. Install it with <code class="inline-cmd">ln -s "$(pwd)/bin/apexyard" ~/.local/bin/apexyard</code> if you want a quick "where am I" outside Claude Code.</p>
+  </div>
+</section>
+
+<!-- ===================== SDLC ===================== -->
+<section id="sdlc">
+  <h2>The SDLC it enforces</h2>
+  <p>Every feature moves through seven phases. Each phase has entry criteria, activities, exit criteria, and a quality gate. The gates are not suggestions — they're enforced by hooks that return <code class="inline-cmd">exit 2</code> on violation.</p>
+
+  <div class="flow">
+    <div class="node"><span class="num">1</span>Planning</div>
+    <div class="arrow"></div>
+    <div class="node"><span class="num">2</span>Design</div>
+    <div class="arrow"></div>
+    <div class="node"><span class="num">3</span>Build</div>
+    <div class="arrow"></div>
+    <div class="node"><span class="num">4</span>Review</div>
+    <div class="arrow"></div>
+    <div class="node"><span class="num">5</span>QA</div>
+    <div class="arrow"></div>
+    <div class="node"><span class="num">6</span>Deploy</div>
+    <div class="arrow"></div>
+    <div class="node"><span class="num">7</span>Monitor</div>
+  </div>
+
+  <h3>The six gates</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Gate</th><th>Before</th><th>Verify</th><th>Enforced by</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>PRD → Tech Design</td><td>PRD approved, parent epic exists</td><td>advisory</td></tr>
+        <tr><td>2</td><td>Tech Design → Build</td><td>Design approved, story tickets exist, AgDR for key decisions</td><td>advisory</td></tr>
+        <tr><td>3</td><td>Starting code</td><td>Ticket exists, branch created, design review if UI work</td><td><code class="inline-cmd">require-active-ticket.sh</code></td></tr>
+        <tr><td>3a</td><td>Starting a migration edit</td><td>Active ticket has <code class="inline-cmd">migration</code> label + body references a migration AgDR</td><td><code class="inline-cmd">require-migration-ticket.sh</code></td></tr>
+        <tr><td>3b</td><td>Design → Build (merging a design-artifact PR)</td><td>Solution Architect (Tariq) sign-off marker at matching HEAD SHA</td><td><code class="inline-cmd">require-architecture-review.sh</code></td></tr>
+        <tr><td>4</td><td>Creating PR</td><td>Tests pass, checks pass, &gt;80% coverage, AgDR linked if decisions made</td><td><code class="inline-cmd">validate-pr-create.sh</code>, <code class="inline-cmd">require-agdr-for-arch-pr.sh</code></td></tr>
+        <tr><td>5</td><td>Merging PR</td><td>2 reviews (Rex + CEO per-PR), CI green, SHA matches review</td><td><code class="inline-cmd">block-unreviewed-merge.sh</code>, <code class="inline-cmd">block-merge-on-red-ci.sh</code></td></tr>
+        <tr><td>6</td><td>Ticket → Done</td><td>QA verified, signed off</td><td>advisory (label-based)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout red">
+    <div class="c-title">If a gate fails → STOP</div>
+    <p>Complete the missing step first. There is no override flag. The escape hatches are explicit and audited: <code class="inline-cmd">&lt;!-- multi-close: approved --&gt;</code> for release PRs that legitimately bundle many tickets; <code class="inline-cmd">&lt;!-- agdr: not-applicable --&gt;</code> for diffs the AgDR gate misfires on; <code class="inline-cmd">&lt;!-- pre-push: skip --&gt;</code> for a one-off emergency push.</p>
+  </div>
+
+  <h3>One ticket at a time — the load-bearing rule</h3>
+  <p>Work on ONE ticket at a time. Complete it fully before starting the next. Each PR = one ticket only.</p>
+  <div class="grid cols-2">
+    <div class="card" style="border-left:3px solid var(--red);">
+      <div class="card-num" style="color:var(--red);">WRONG</div>
+      <div class="codeblock" style="margin:0;border:none;">
+        <pre><code>Start #6 → Start #7 → Start #8
+        → PR with all 3</code></pre>
+      </div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--green);">
+      <div class="card-num" style="color:var(--green);">RIGHT</div>
+      <div class="codeblock" style="margin:0;border:none;">
+        <pre><code>Start #6 → PR → Review → QA → Done
+Start #7 → PR → Review → QA → Done
+Start #8 → PR → Review → QA → Done</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <h3>Early-work taxonomy — three scaffolds, two axes</h3>
+  <p>The framework draws a sharp line between throwaway learning and the production spine:</p>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Skill</th><th>Question it answers</th><th>Lifecycle</th><th>Gates</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">/spike</code></td><td>"Will this <em>technically</em> work?"</td><td>THROWAWAY — <code class="inline-cmd">/spike-close</code> disposition</td><td>Exempt from AgDR + 80% coverage; Rex + Hakim still apply</td></tr>
+        <tr><td><code class="inline-cmd">/prototype</code></td><td>"What should it <em>look and feel</em> like?"</td><td>THROWAWAY — <code class="inline-cmd">/prototype-close</code> disposition</td><td>Same exemptions as /spike</td></tr>
+        <tr><td><code class="inline-cmd">/walking-skeleton</code></td><td>"Is the <em>whole architecture</em> wired end-to-end?"</td><td><strong>KEPT</strong> — grown into the product</td><td>FULL SDLC, NO exemptions</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Spikes and prototypes are disposable (the <em>learning</em> survives, the code doesn't). A walking skeleton is the production spine — minimal but kept. Don't accidentally promote a throwaway into production.</p>
+</section>
+
+<!-- ===================== WALKTHROUGH ===================== -->
+<section id="walkthrough">
+  <h2>End-to-end walkthrough — feature #42 "Export orders to CSV"</h2>
+  <p>One ticket, one PR, the full SDLC. This is what the framework actually does at each phase, with the real skill invocations, the real hook firings, and the real session-state writes.</p>
+
+  <h3>Phase 1 — Planning</h3>
+  <p>The product manager (Mariam) drafted the PRD via <code class="inline-cmd">/write-spec</code>. The Tech Lead (Hisham) reviews it and breaks it into story tickets. The Pre-Build gate is satisfied because the parent epic + user stories + ACs all exist in GitHub Issues.</p>
+  <div class="mark-line">▸ Activating Hisham (Tech Lead) for #42 (trigger: planning phase)</div>
+
+  <h3>Phase 2 — Technical Design</h3>
+  <p>Hisham authors the technical design. Before drafting, he runs <code class="inline-cmd">/agdr search export</code> to check whether the portfolio has already decided on a CSV library. (It has — AgDR-0042 picked <code class="inline-cmd">papaparse</code> for a sibling project; he reuses it.) The design lands as a PR. Before it can merge, the architecture gate fires:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">terminal</span></div>
+    <pre><code>/design-review 487        # Tariq (Solution Architect) reviews the design PR
+/approve-architecture 487  # Records the sign-off marker (or Tariq writes it directly)</code></pre>
+  </div>
+  <p>The <code class="inline-cmd">require-architecture-review.sh</code> hook blocks the merge until Tariq's marker at <code class="inline-cmd">.claude/session/reviews/487-architecture.approved</code> exists and its SHA matches HEAD.</p>
+
+  <h3>Phase 3 — Build</h3>
+  <p>You declare the active ticket for the session. The skill writes a per-project marker:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">terminal</span></div>
+    <pre><code>/start-ticket 42</code></pre>
+  </div>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">.claude/session/tickets/example-app</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>repo=your-org/example-app
+number=42
+title=Export orders to CSV
+url=https://github.com/your-org/example-app/issues/42
+suggested_branch=feature/GH-42-csv-export
+started_at=2026-07-07T14:22:00Z</code></pre>
+  </div>
+  <p>Without that marker, the first code edit would hard-block:</p>
+  <details class="collapsible">
+    <summary>The actual BLOCKED message from <code class="inline-cmd">require-active-ticket.sh</code></summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">stderr</span></div>
+        <pre><code>BLOCKED: No active ticket set for this session.
+
+ApexYard requires a ticket BEFORE any code changes (workflow-gates rule #3,
+pre-build gate, "one ticket at a time").
+
+To unblock:
+
+  1. Create or find the ticket (GitHub Issue in the project's own repo):
+       gh issue create --repo &lt;owner/repo&gt; --title "..."
+  2. Declare it for this session — run the /start-ticket skill with the
+     issue number (or pass owner/repo#number to pin it). The skill writes
+     a per-project marker if the ticket's repo matches a registered
+     managed project, otherwise falls back to the ops-level marker.
+  3. Retry the edit
+
+Markers looked up for this path (in order):
+  per-project:  /Users/.../apexyard/.claude/session/tickets/example-app
+  ops fallback: /Users/.../apexyard/.claude/session/current-ticket
+
+Exempt paths (no ticket required): .claude/, docs/, projects/*/docs/, *.md</code></pre>
+      </div>
+    </div>
+  </details>
+  <p>You branch correctly — the hook will refuse anything else on push:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">bash</span></div>
+    <pre><code>git checkout -b feature/GH-42-csv-export</code></pre>
+  </div>
+
+  <h3>Phase 3 (sub-workflow) — A migration is involved</h3>
+  <p>The feature needs a new column. You run <code class="inline-cmd">/migration</code> first — it creates a labelled ticket <em>and</em> a migration AgDR in one flow. Then you <code class="inline-cmd">/start-ticket 43</code> (the migration ticket), and only then can you edit <code class="inline-cmd">prisma/migrations/.../migration.sql</code>:</p>
+  <details class="collapsible">
+    <summary>If you skip the migration ticket, here's the actual block</summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">stderr</span></div>
+        <pre><code>BLOCKED: No active ticket set — and this file looks like a database migration.
+
+Migrations need a dedicated labelled ticket + AgDR, not just any ticket.
+Run /migration to create both in one guided flow:
+
+  /migration example-app
+
+Then /start-ticket &lt;owner/repo&gt;#&lt;number&gt; to activate the new ticket for
+this session, and retry the edit.
+
+Path matched migration pattern: prisma/migrations/0007_add_exported_at/migration.sql</code></pre>
+      </div>
+    </div>
+  </details>
+
+  <h3>Phase 4 — Code Review</h3>
+  <p>You push the branch and open a PR. The branch-name hook fires on <code class="inline-cmd">git push</code>; the PR-create hook fires on <code class="inline-cmd">gh pr create</code>. Then <em>automatically</em>, the <code class="inline-cmd">auto-code-review.sh</code> PostToolUse hook triggers Rex on the new PR.</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">bash</span></div>
+    <pre><code>git push -u origin feature/GH-42-csv-export
+gh pr create --title "feat(#42): add CSV export" --body-file pr-body.md</code></pre>
+  </div>
+  <p>Rex (the code-reviewer agent, model: <code class="inline-cmd">opus</code>) reviews the diff, consults the framework rules + adopter handbooks, and on <strong>APPROVED</strong> writes the local approval marker <em>and</em> posts a GitHub review:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">.claude/session/reviews/your-org__example-app__42-rex.approved</span></div>
+    <pre><code>9f3a2c1b8d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a</code></pre>
+  </div>
+  <p>(Bare SHA — Rex's marker has a different threat model than the CEO marker.) If the PR touches <code class="inline-cmd">**/auth/**</code> or <code class="inline-cmd">.env*</code>, Hakim (Security Auditor) auto-activates too. If it touches UI files, a design-review gate fires.</p>
+
+  <h3>Phase 5 — Merge (the two-marker gate)</h3>
+  <p>You cannot merge yet. Plan-level "go" is explicitly <em>not</em> merge approval. You ask the CEO explicitly: "PR #42 ready to merge — approved?" On "approved", you run:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">terminal</span></div>
+    <pre><code>/approve-merge 42</code></pre>
+  </div>
+  <p>The skill writes the structured CEO marker (the merge gate rejects the old bare-SHA format):</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">.claude/session/reviews/your-org__example-app__42-ceo.approved</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>sha=9f3a2c1b8d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a
+approved_by=user
+approved_at=2026-07-07T16:08:00Z
+skill_version=2
+approval_summary=CEO per-PR approval for #42 CSV export</code></pre>
+  </div>
+  <p>Then <code class="inline-cmd">gh pr merge 42 --squash --delete-branch</code> goes through. The merge gate reads both markers and verifies both SHAs match HEAD.</p>
+  <details class="collapsible">
+    <summary>If the CEO marker is missing — the real BLOCKED message</summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">stderr</span></div>
+        <pre><code>BLOCKED: PR #42 has Rex approval but no CEO approval marker.
+
+Plan-level "go" / "continue" / "ship it" does NOT authorize a merge. Each
+merge requires an explicit per-PR, per-merge CEO approval that names the
+PR. See .claude/rules/pr-workflow.md § "Plan-level 'go' is NOT merge
+approval" for the full rationale.
+
+Missing file:
+  /Users/.../apexyard/.claude/session/reviews/your-org__example-app__42-ceo.approved</code></pre>
+      </div>
+    </div>
+  </details>
+
+  <h3>Phase 5 (continued) — QA Verification</h3>
+  <p>The merged PR does <em>not</em> auto-close the ticket. The PR body uses <code class="inline-cmd">Refs #42</code> + the <code class="inline-cmd">qa</code> label, which auto-triggers Salim (QA Engineer):</p>
+  <div class="mark-line">▸ Activating Salim (QA Engineer) for #42 (trigger: ticket labeled qa)</div>
+  <p>Salim verifies every acceptance criterion against the staging build. Only his sign-off moves the ticket to Done.</p>
+
+  <h3>Phase 6 &amp; 7 — Deploy + Monitor</h3>
+  <p>Platform Engineer (Adel) deploys. SRE (Saif) watches the 24-48h post-deploy window. The Head of Engineering (Khalid) is the escalation path for sustained incidents.</p>
+
+  <div class="callout">
+    <div class="c-title">What just happened, mechanically</div>
+    <p>One ticket produced: a PRD, a technical design with an AgDR, a migration ticket + migration AgDR, a feature branch with the right name, a PR with the right title, a Rex review, a CEO approval marker, a QA verification, a deploy, and a 48h watch window. Every gate that could be enforced mechanically was. Nothing depended on the model remembering a rule.</p>
+  </div>
+</section>
+
+<!-- ===================== SKILLS ===================== -->
+<section id="skills">
+  <h2>Skills — the 63 slash commands</h2>
+  <p>One-line summary per skill; canonical details live in each <code class="inline-cmd">.claude/skills/&lt;name&gt;/SKILL.md</code>. Each skill has YAML frontmatter (<code class="inline-cmd">name</code>, <code class="inline-cmd">description</code>, <code class="inline-cmd">argument-hint</code>, optional <code class="inline-cmd">effort</code> and <code class="inline-cmd">allowed-tools</code>) followed by a Process the agent executes when you type the command.</p>
+
+  <h3>By category — the ones you'll use every day</h3>
+
+  <h4>Bootstrap &amp; portfolio</h4>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Skill</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">/setup</code></td><td>First-run bootstrap. Three exchanges → writes <code class="inline-cmd">onboarding.yaml</code> + the registry. Also offers LSP install.</td></tr>
+        <tr><td><code class="inline-cmd">/handover</code> &lt;repo&gt;</td><td>Adopt an external repo. Scores harnessability across 5 dimensions, seeds per-project docs, registers in <code class="inline-cmd">apexyard.projects.yaml</code>.</td></tr>
+        <tr><td><code class="inline-cmd">/projects</code></td><td>List every managed project with status, branch, open PRs, open issues.</td></tr>
+        <tr><td><code class="inline-cmd">/inbox</code></td><td>Items needing your attention across the portfolio — PRs, issues, comments, blockers.</td></tr>
+        <tr><td><code class="inline-cmd">/status</code> [--briefing]</td><td>Git + CI snapshot per project. <code class="inline-cmd">--briefing</code> = 4-line shape.</td></tr>
+        <tr><td><code class="inline-cmd">/tasks</code></td><td>Aggregated, scored, prioritised task list with direct URLs.</td></tr>
+        <tr><td><code class="inline-cmd">/update</code></td><td>Sync the ops fork with upstream. Walks a per-version migration chain.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Tickets &amp; early work</h4>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Skill</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">/start-ticket</code> &lt;N | owner/repo#N&gt;</td><td>Declare the active ticket so the ticket-first hook lets code edits through. Writes a per-project marker.</td></tr>
+        <tr><td><code class="inline-cmd">/feature</code></td><td>Create a structured feature ticket (user story + acceptance criteria).</td></tr>
+        <tr><td><code class="inline-cmd">/bug</code></td><td>Create a structured bug ticket (Given/When/Then + repro + severity).</td></tr>
+        <tr><td><code class="inline-cmd">/task</code></td><td>Create a structured technical task ticket (driver + scope + ACs).</td></tr>
+        <tr><td><code class="inline-cmd">/tickets-batch</code></td><td>Bulk-file 5–20 structured tickets in one shared-context flow.</td></tr>
+        <tr><td><code class="inline-cmd">/spike</code> / <code class="inline-cmd">/spike-close</code></td><td>Time-boxed hypothesis-driven spike; disposition gate promotes or discards.</td></tr>
+        <tr><td><code class="inline-cmd">/prototype</code> / <code class="inline-cmd">/prototype-close</code></td><td>Throwaway UX/demo prototype; mirror of /spike for the "look and feel" question.</td></tr>
+        <tr><td><code class="inline-cmd">/walking-skeleton</code></td><td>Thinnest end-to-end slice through every architectural layer. KEPT, full SDLC, no exemptions.</td></tr>
+        <tr><td><code class="inline-cmd">/migration</code></td><td>Creates a labelled migration ticket + migration AgDR in one guided flow. Required by the migration gate.</td></tr>
+        <tr><td><code class="inline-cmd">/investigation</code></td><td>Sustained root-cause work (incident retros, bug archaeology, regression hunts).</td></tr>
+        <tr><td><code class="inline-cmd">/idea</code></td><td>Capture a new product idea to the shared backlog.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Reviews &amp; decisions</h4>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Skill</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">/code-review</code> &lt;pr&gt;</td><td>Invoke Rex (Code Reviewer agent) on a PR.</td></tr>
+        <tr><td><code class="inline-cmd">/security-review</code> &lt;pr&gt;</td><td>Invoke Hakim (Security Reviewer) on a PR.</td></tr>
+        <tr><td><code class="inline-cmd">/design-review</code> &lt;pr&gt;</td><td>Invoke Tariq (Solution Architect) on a design / migration AgDR / feature spec.</td></tr>
+        <tr><td><code class="inline-cmd">/approve-merge</code> &lt;pr&gt; [--no-merge]</td><td>Record per-PR CEO approval and merge in one turn. ONLY on explicit "approved".</td></tr>
+        <tr><td><code class="inline-cmd">/approve-design</code> &lt;pr&gt;</td><td>Record per-PR design-review approval for UI PRs.</td></tr>
+        <tr><td><code class="inline-cmd">/approve-architecture</code> &lt;pr&gt;</td><td>Record per-PR architecture-review approval for design-artifact PRs.</td></tr>
+        <tr><td><code class="inline-cmd">/decide</code></td><td>Make a technical decision and create an AgDR.</td></tr>
+        <tr><td><code class="inline-cmd">/agdr</code> browse|search|show|stats</td><td>Browse / search / show / stats across the portfolio's AgDR library.</td></tr>
+        <tr><td><code class="inline-cmd">/challenge</code></td><td>Invoke Naqid (The Contrarian) to steelman-then-challenge an idea, feature, or decision. Advisory only.</td></tr>
+        <tr><td><code class="inline-cmd">/codify-rule</code></td><td>Turn a review comment that caught a Rex-miss into a draft handbook entry.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Architecture &amp; audits</h4>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Skill</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">/write-spec</code></td><td>Generate a PRD or feature spec from a problem statement.</td></tr>
+        <tr><td><code class="inline-cmd">/validate-idea</code></td><td>Lightweight 5-question pre-spec gate.</td></tr>
+        <tr><td><code class="inline-cmd">/c4</code> &lt;project&gt;</td><td>Generate C4 L1 (Context) + L2 (Container) Mermaid diagrams from a codebase.</td></tr>
+        <tr><td><code class="inline-cmd">/dfd</code> &lt;project&gt;</td><td>Data Flow Diagram with trust boundaries — input to /threat-model.</td></tr>
+        <tr><td><code class="inline-cmd">/threat-model</code></td><td>STRIDE threat modelling (spoofing, tampering, repudiation, disclosure, DoS, EoP).</td></tr>
+        <tr><td><code class="inline-cmd">/tech-vision</code> &lt;project&gt;</td><td>Interactive author for the architecture vision (target / gap / migration / anti-scope).</td></tr>
+        <tr><td><code class="inline-cmd">/journey</code> &lt;feature&gt; --from-prd &lt;file&gt;</td><td>Self-contained HTML user-journey map (boxes/arrows with per-page modals).</td></tr>
+        <tr><td><code class="inline-cmd">/launch-check</code> [--workflow]</td><td>Production readiness audit — 10-dimension go/no-go sweep. Opt-in <code class="inline-cmd">--workflow</code> fans out in parallel + adversarially verifies.</td></tr>
+        <tr><td><code class="inline-cmd">/accessibility-audit</code></td><td>WCAG 2.1 AA — perceivable, operable, understandable, robust.</td></tr>
+        <tr><td><code class="inline-cmd">/seo-audit</code></td><td>Technical SEO — meta, OG, sitemap, robots, structured data.</td></tr>
+        <tr><td><code class="inline-cmd">/geo-audit</code></td><td>GEO/AEO — <code class="inline-cmd">llms.txt</code>, <code class="inline-cmd">AGENTS.md</code>, AI-crawler robots, JSON-LD citation grounding.</td></tr>
+        <tr><td><code class="inline-cmd">/compliance-check</code></td><td>GDPR + ePrivacy — consent, privacy policy, data handling, user rights.</td></tr>
+        <tr><td><code class="inline-cmd">/performance-audit</code></td><td>Bundle size, images, lazy load, code split, Core Web Vitals.</td></tr>
+        <tr><td><code class="inline-cmd">/monitoring-audit</code></td><td>Observability — error tracking, health endpoints, alerting, runbooks.</td></tr>
+        <tr><td><code class="inline-cmd">/analytics-audit</code></td><td>SDK coverage, event naming, funnel completeness.</td></tr>
+        <tr><td><code class="inline-cmd">/docs-audit</code></td><td>Diataxis — tutorials, how-to, reference, explanation.</td></tr>
+        <tr><td><code class="inline-cmd">/mutation-test</code></td><td>Mutation-testing sensor (Stryker/MutPy/go-mutesting/mutant). Milestone cadence, not per-PR.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Releases &amp; framework-only</h4>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Skill</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">/release</code> [vX.Y.Z]</td><td>(Framework-only) Cut an apexyard release — diff dev↔main, pick semver bump, generate CHANGELOG, open release PR, auto-tag on merge.</td></tr>
+        <tr><td><code class="inline-cmd">/release-sync</code> vX.Y.Z</td><td>(Framework-only) Sync main back to dev after a squash-merge release.</td></tr>
+        <tr><td><code class="inline-cmd">/stakeholder-update</code></td><td>Generate weekly / monthly / launch stakeholder updates.</td></tr>
+        <tr><td><code class="inline-cmd">/roadmap</code></td><td>Update / create / reprioritise the product roadmap.</td></tr>
+        <tr><td><code class="inline-cmd">/plan-initiative</code></td><td>Initiative → milestones → tasks: Socratic interview, DAG, topo-sorted sequence, filing with blocks/blocked-by cross-refs.</td></tr>
+        <tr><td><code class="inline-cmd">/pdf</code></td><td>Convert framework markdown / HTML / BPMN to PDF.</td></tr>
+        <tr><td><code class="inline-cmd">/fan-out</code></td><td>Spawn N parallel agents in one message (per-task agent type, worktree isolation, background mode).</td></tr>
+        <tr><td><code class="inline-cmd">/split-portfolio</code></td><td>Migrate single-fork to split-portfolio mode via a gated destructive recovery flow.</td></tr>
+        <tr><td><code class="inline-cmd">/report-apexyard-bug</code></td><td>Report a bug in the framework itself, upstream to <code class="inline-cmd">me2resh/apexyard</code>.</td></tr>
+        <tr><td><code class="inline-cmd">/request-apexyard-feature</code></td><td>Request a feature for the framework itself, upstream.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <div class="c-title">The 5-dimension harnessability score</div>
+    <p>When you run <code class="inline-cmd">/handover</code>, the skill scores the target repo across five dimensions: <strong>type safety</strong>, <strong>module boundaries</strong>, <strong>framework opinionation</strong>, <strong>test coverage signal</strong>, <strong>lint baseline</strong>. A "low" score warns verbatim that Rex's blocking handbooks will false-positive — so you know to either tighten the codebase or relax the handbooks before the first review.</p>
+  </div>
+</section>
+
+<!-- ===================== HOOKS ===================== -->
+<section id="hooks">
+  <h2>Hooks — the mechanical gates</h2>
+  <p>Hooks are the load-bearing layer. A rule in markdown is a suggestion; a shell script returning <code class="inline-cmd">exit 2</code> is a wall. Every hook emits a <code class="inline-cmd">BLOCKED: ...</code> message to stderr that names the missing artefact and gives a concrete unblock recipe.</p>
+
+  <h3>The exit-code contract</h3>
+  <div class="grid cols-3">
+    <div class="card" style="border-left:3px solid var(--green);">
+      <div class="card-num" style="color:var(--green);">exit 0</div>
+      <h4>Allow</h4>
+      <p>The tool call proceeds. Advisory hooks (warnings, drift banners, MCP suggestions) also use 0.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--red);">
+      <div class="card-num" style="color:var(--red);">exit 2</div>
+      <h4>Block</h4>
+      <p>The tool call is cancelled. stderr begins with <code class="inline-cmd">BLOCKED:</code> and ends with a "To unblock" guide. The model sees it and can self-correct.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--amber);">
+      <div class="card-num" style="color:var(--amber);">fail-open</div>
+      <h4>Tooling missing</h4>
+      <p>If a required tool (jq, shellcheck, npx) is missing, the hook skips with exit 0 and an install hint — never hard-blocks a contributor for a missing binary.</p>
+    </div>
+  </div>
+
+  <h3>The top-10 enforcement hooks</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Hook</th><th>Fires on</th><th>What it blocks</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">require-active-ticket.sh</code></td><td>Edit/Write/MultiEdit + Bash writes</td><td>Code edits with no active ticket marker (per-project / per-worktree / ops fallback)</td></tr>
+        <tr><td><code class="inline-cmd">require-migration-ticket.sh</code></td><td>Edits to migration paths</td><td>Schema edits without a labelled <code class="inline-cmd">migration</code> ticket + AgDR reference</td></tr>
+        <tr><td><code class="inline-cmd">validate-branch-name.sh</code></td><td><code class="inline-cmd">git push *</code></td><td>Branches not matching <code class="inline-cmd">{type}/{TICKET-ID}-{description}</code></td></tr>
+        <tr><td><code class="inline-cmd">block-unreviewed-merge.sh</code></td><td><code class="inline-cmd">gh pr merge *</code>, <code class="inline-cmd">gh api *</code></td><td>Missing Rex marker OR CEO marker; SHA mismatch; sync-PR squashed</td></tr>
+        <tr><td><code class="inline-cmd">block-merge-on-red-ci.sh</code></td><td><code class="inline-cmd">gh pr merge *</code></td><td>Merge when the PR's CI is failing</td></tr>
+        <tr><td><code class="inline-cmd">require-architecture-review.sh</code></td><td><code class="inline-cmd">gh pr merge *</code> on design-artifact PRs</td><td>Merge of a design PR without Tariq's sign-off marker at matching HEAD</td></tr>
+        <tr><td><code class="inline-cmd">require-design-review-for-ui.sh</code></td><td><code class="inline-cmd">gh pr merge *</code> on UI PRs</td><td>Merge of a UI PR without a design-review approval marker</td></tr>
+        <tr><td><code class="inline-cmd">check-secrets.sh</code></td><td><code class="inline-cmd">git commit *</code></td><td>Staged files matching API-key/password/token patterns (regex on staged diff)</td></tr>
+        <tr><td><code class="inline-cmd">block-git-add-all.sh</code></td><td><code class="inline-cmd">git add *</code></td><td><code class="inline-cmd">git add -A</code>, <code class="inline-cmd">--all</code>, <code class="inline-cmd">git add .</code> — staging must be explicit</td></tr>
+        <tr><td><code class="inline-cmd">block-main-push.sh</code></td><td><code class="inline-cmd">git push *</code></td><td>Direct pushes to <code class="inline-cmd">main</code> / <code class="inline-cmd">dev</code> — every change goes through a PR</td></tr>
+        <tr><td><code class="inline-cmd">validate-commit-format.sh</code></td><td><code class="inline-cmd">git commit *</code></td><td>Commits not matching conventional commit <code class="inline-cmd">type: subject</code></td></tr>
+        <tr><td><code class="inline-cmd">validate-pr-create.sh</code></td><td><code class="inline-cmd">gh pr create *</code></td><td>Bad PR title, missing Glossary section, multi-ticket PR (without the escape marker)</td></tr>
+        <tr><td><code class="inline-cmd">require-agdr-for-arch-changes.sh</code></td><td><code class="inline-cmd">git commit *</code> on arch files</td><td>Commits touching architecture without an AgDR reference</td></tr>
+        <tr><td><code class="inline-cmd">require-agdr-for-arch-pr.sh</code></td><td><code class="inline-cmd">gh pr create *</code></td><td>PRs with architecture changes but no AgDR reference in the body</td></tr>
+        <tr><td><code class="inline-cmd">block-private-refs-in-public-repos.sh</code></td><td><code class="inline-cmd">gh issue/pr/comment/api *</code></td><td>Leak protection — private project names referenced from the public fork</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details class="collapsible">
+    <summary>The real BLOCKED message from <code class="inline-cmd">validate-branch-name.sh</code></summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">stderr — after pushing a branch named "add-export"</span></div>
+        <pre><code>BLOCKED: Branch 'add-export' doesn't follow naming convention.
+
+Required shape (.claude/rules/git-conventions.md § "Branch Naming"):
+  {type}/{TICKET-ID}-{description}
+
+Accepted types: feature, fix, refactor, chore, docs, test, spike, ci, build, perf, sync
+  (configurable: .claude/project-config.*.json → .branch.type_whitelist)
+
+Accepted ticket-ID pattern: (#?[0-9]+|[A-Z]{2,10}-[0-9]+)
+  (configurable: .claude/project-config.*.json → .tracker.id_pattern)
+
+Examples:
+  feature/ABC-123-add-auth
+  fix/GH-45-login-bug
+  docs/ENG-99-update-readme
+
+To unblock:
+  1. Pick a ticket-ID (existing or new): /feature, /task, /bug
+  2. Pick a short kebab-case description (max ~40 chars)
+  3. Rename the current branch in place:
+       git branch -m "add-export" "feature/GH-XX-your-description"
+     OR start fresh from the project's integration branch:
+       git checkout main && git checkout -b "feature/GH-XX-your-description"
+  4. Retry the operation</code></pre>
+      </div>
+    </div>
+  </details>
+
+  <details class="collapsible">
+    <summary>The real BLOCKED message from <code class="inline-cmd">block-unreviewed-merge.sh</code> (Rex missing)</summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">stderr</span></div>
+        <pre><code>BLOCKED: PR #42 has no recorded code-reviewer (Rex) approval.
+
+ApexYard requires two reviews before merge (workflow-gates rule #5):
+  1. Code Reviewer agent (Rex) — automated, recorded in .claude/session/reviews/
+  2. Human approver (CEO) — recorded by the /approve-merge skill
+
+Missing file:
+  /Users/.../apexyard/.claude/session/reviews/your-org__example-app__42-rex.approved
+
+To unblock:
+  1. Invoke the code-reviewer agent on this PR
+  2. When Rex returns "approved", it records the approval automatically
+  3. Then run /approve-merge 42 for the CEO approval
+  4. Retry the merge
+
+Never skip this check — even for typo fixes. See .claude/rules/pr-workflow.md.</code></pre>
+      </div>
+    </div>
+  </details>
+
+  <div class="callout">
+    <div class="c-title">Why exit 2 with a recipe, not a silent fail</div>
+    <p>The model sees the stderr. A well-written <code class="inline-cmd">BLOCKED:</code> message tells the model exactly what to do next — file the ticket, invoke the skill, fix the format — so it self-corrects in the next turn instead of flailing. This is the framework's feedback loop: hooks teach the model by blocking, not by erroring.</p>
+  </div>
+</section>
+
+<!-- ===================== AGENTS ===================== -->
+<section id="agents">
+  <h2>Agents &amp; roles — 20 personas + 6 utility agents</h2>
+  <p>Twenty role definitions live in <code class="inline-cmd">roles/</code> across six departments. Each role file defines identity, responsibilities, CAN/CANNOT boundaries, interfaces, handoffs, and escalation triggers. The agent file at <code class="inline-cmd">.claude/agents/&lt;name&gt;.md</code> is a thin runtime wrapper that owns the model tier + tool allowlist + agent metadata.</p>
+
+  <h3>The persona roster</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Department</th><th>Personas</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Engineering</strong></td><td>Khalid (Head), Hisham (Tech Lead), Karim (Backend), Yasmin (Frontend), Salim (QA), Adel (Platform), Saif (SRE)</td></tr>
+        <tr><td><strong>Architecture</strong></td><td>Tariq (Solution Architect — reviews designs before Build)</td></tr>
+        <tr><td><strong>Product</strong></td><td>Omar (Head), Mariam (PM), Hanan (Product Analyst)</td></tr>
+        <tr><td><strong>Design</strong></td><td>Maha (Head), Nour (UI Designer), Iman (UX Designer)</td></tr>
+        <tr><td><strong>Security</strong></td><td>Faisal (Head), Hakim (Security Auditor), Hamza (Pen Tester)</td></tr>
+        <tr><td><strong>Data</strong></td><td>Khalil (Head), Nadia (Data Analyst), Anwar (Data Engineer)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Plus six utility agents that aren't tied to a department:</p>
+  <div class="grid cols-3">
+    <div class="card"><div class="card-num">Rex</div><h4>Code Reviewer</h4><p>Model: opus. Auto-runs on every PR. Writes the SHA-bound approval marker that the merge gate reads.</p></div>
+    <div class="card"><div class="card-num">Hakim</div><h4>Security Reviewer</h4><p>Model: opus. Auto-fires on auth/crypto/secrets/user-data diffs AND on <code class="inline-cmd">.claude/hooks/**</code> + <code class="inline-cmd">settings.json</code> changes (the trust chain).</p></div>
+    <div class="card"><div class="card-num">Tariq</div><h4>Solution Architect</h4><p>Model: opus. "Rex for the non-code stuff" — reviews designs before Build. Gate 3b enforced by <code class="inline-cmd">require-architecture-review.sh</code>.</p></div>
+    <div class="card"><div class="card-num">Munir</div><h4>Dependency Auditor</h4><p>Model: sonnet. <code class="inline-cmd">/audit-deps</code> — vulnerabilities, outdated packages, licences.</p></div>
+    <div class="card"><div class="card-num">Idris</div><h4>Ticket Manager</h4><p>Model: sonnet. Drives tracker operations behind the ticket-creating skills.</p></div>
+    <div class="card"><div class="card-num">Naqid</div><h4>The Contrarian</h4><p>Model: opus. Advisory premise-adversary. <code class="inline-cmd">/challenge</code> — steelman-then-challenge. Never blocks a gate.</p></div>
+  </div>
+
+  <h3>How roles activate — auto vs prompted</h3>
+  <p>Roles activate on <strong>specific conditions</strong>, detected by the <code class="inline-cmd">detect-role-trigger.sh</code> hook (PreToolUse on Bash + UserPromptSubmit). Full table at <code class="inline-cmd">.claude/rules/role-triggers.md</code>:</p>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Role</th><th>Auto-activates when…</th></tr></thead>
+      <tbody>
+        <tr><td>QA Engineer (Salim)</td><td>Ticket moves to the <code class="inline-cmd">qa</code> label after merge</td></tr>
+        <tr><td>Security Auditor (Hakim)</td><td>PR diff touches <code class="inline-cmd">**/auth/**</code>, <code class="inline-cmd">**/crypto/**</code>, <code class="inline-cmd">**/secrets/**</code>, <code class="inline-cmd">.env*</code>, or <code class="inline-cmd">.claude/hooks/**</code> + <code class="inline-cmd">settings.json</code></td></tr>
+        <tr><td>Platform Engineer (Adel)</td><td>PR diff touches <code class="inline-cmd">.github/workflows/**</code>, <code class="inline-cmd">golden-paths/pipelines/**</code></td></tr>
+        <tr><td>SRE (Saif)</td><td>Production incident / SLO breach</td></tr>
+        <tr><td>Solution Architect (Tariq)</td><td>PR touches a technical-design / migration-AgDR / PRD artifact (Gate 3b)</td></tr>
+        <tr><td>Tech Lead (Hisham)</td><td>Planning phase starts (approved PRD enters sprint)</td></tr>
+        <tr><td>Product Manager (Mariam)</td><td>New PRD drafted</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>You can also explicitly activate any role: <em>"act as the QA Engineer for ticket #42"</em>, <em>"put on your Tech Lead hat"</em>. When a role activates, hand off, or exit, the agent prints a single-line marker so operators can see who's driving:</p>
+  <div class="mark-line">▸ Activating Salim (QA Engineer) for #42 (trigger: ticket labeled qa)</div>
+  <div class="mark-line">▸ Salim (QA Engineer) → Mariam (Product Manager) (handoff: acceptance criteria signed off)</div>
+  <div class="mark-line">▸ Salim (QA Engineer) task complete — returning to ambient mode</div>
+
+  <h3>Isolated-work-class vs in-flow-class</h3>
+  <p>The <code class="inline-cmd">detect-role-trigger.sh</code> hook reads each role file's <code class="inline-cmd">## Activation mode</code> section and routes activation one of two ways:</p>
+  <div class="grid cols-2">
+    <div class="card" style="border-left:3px solid var(--accent);">
+      <div class="card-num" style="color:var(--accent);">isolated-work-class</div>
+      <h4>Spawn a sub-agent</h4>
+      <p>Review-shaped, sandboxable, repeatable work — QA verification, security review, architecture review, dependency audit. Gets its own context, model tier (often opus or haiku), and tool restriction (often read-only). 12 roles.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--green);">
+      <div class="card-num" style="color:var(--green);">in-flow-class</div>
+      <h4>Adopt in-thread</h4>
+      <p>Iterative, conversational, context-heavy work — Backend/Frontend engineering, Product Manager authoring a PRD, UI/UX Designer. Loses too much shared context if spawned out. 7 roles.</p>
+    </div>
+  </div>
+  <div class="callout">
+    <div class="c-title">Why it matters for cost</div>
+    <p>In-flow roles run on your primary tier (usually Opus) — that's why the main agent dominates token spend. The biggest cost lever is <code class="inline-cmd">opusplan</code> (Opus plans, Sonnet executes). See <code class="inline-cmd">docs/orchestrator-cost-model.md</code> and the "best way" section below.</p>
+  </div>
+</section>
+
+<!-- ===================== TEMPLATES ===================== -->
+<section id="templates">
+  <h2>Templates — forms, not content</h2>
+  <p>Templates live in <code class="inline-cmd">templates/</code>. Each is consumed by a specific skill at invocation time. They are <em>forms</em>, not content — when you override one, you replace it wholesale; partial-merge across two markdown files would be unreliable.</p>
+
+  <h3>Inventory</h3>
+  <div class="grid cols-3">
+    <div class="card"><div class="card-num">Top-level</div><p><code class="inline-cmd">prd.md</code>, <code class="inline-cmd">agdr.md</code>, <code class="inline-cmd">agdr-migration.md</code>, <code class="inline-cmd">adr.md</code>, <code class="inline-cmd">technical-design.md</code>, <code class="inline-cmd">initiative.md</code>, <code class="inline-cmd">spike.md</code>, <code class="inline-cmd">investigation.md</code></p></div>
+    <div class="card"><div class="card-num">tickets/</div><p><code class="inline-cmd">feature.md</code>, <code class="inline-cmd">bug.md</code>, <code class="inline-cmd">task.md</code>, <code class="inline-cmd">idea.md</code>, <code class="inline-cmd">migration.md</code>, <code class="inline-cmd">spike.md</code>, <code class="inline-cmd">investigation.md</code> — one per ticket-creating skill</p></div>
+    <div class="card"><div class="card-num">architecture/</div><p><code class="inline-cmd">c4-context.md</code> (L1), <code class="inline-cmd">c4-container.md</code> (L2), <code class="inline-cmd">vision.md</code>, <code class="inline-cmd">dfd.md</code>, <code class="inline-cmd">sequence.md</code></p></div>
+  </div>
+
+  <h3>Real before/after — feature ticket</h3>
+  <div class="tabs">
+    <div class="tab-bar">
+      <button class="active" data-tab="ft-tpl">Template (templates/tickets/feature.md)</button>
+      <button data-tab="ft-fill">Filled-in — #42 Export orders to CSV</button>
+    </div>
+    <div class="tab-panel active" data-panel="ft-tpl">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">markdown</span></div>
+        <pre><code>**[Feature] {{title}}**
+
+## User Story
+As a {{persona}}, I want {{goal}} so that {{benefit}}.
+
+## Acceptance Criteria
+{{acceptance_criteria}}
+
+## Design Notes
+{{design_notes}}
+
+## Out of Scope
+{{out_of_scope}}
+
+## Effort Estimate
+TBD
+
+## Glossary
+| Term | Definition |
+|------|------------|
+| {{glossary_term_1}} | {{glossary_definition_1}} |</code></pre>
+      </div>
+    </div>
+    <div class="tab-panel" data-panel="ft-fill">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">markdown — the filed ticket</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>**[Feature] Export orders to CSV**
+
+## User Story
+As a store owner, I want to download my last 90 days of orders as a CSV
+so that I can reconcile payouts in my accounting tool.
+
+## Acceptance Criteria
+- [ ] Admin-only "Export CSV" button on /admin/orders
+- [ ] Date-range picker capped at 90 days
+- [ ] Async export; UI shows progress + emails download link when ready
+
+## Design Notes
+Reuse the existing async-job infra (BullMQ queue `exports`).
+
+## Out of Scope
+PDF export, scheduled/recurring exports, exports &gt; 90 days.
+
+## Effort Estimate
+TBD
+
+## Glossary
+| Term | Definition |
+|------|------------|
+| Async export | Job enqueued in BullMQ; user emailed when ready |
+| BullMQ | Redis-backed job queue used by the platform |</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <h3>Real before/after — C4 L1 Context diagram</h3>
+  <div class="tabs">
+    <div class="tab-bar">
+      <button class="active" data-tab="c4-tpl">Template (templates/architecture/c4-context.md)</button>
+      <button data-tab="c4-fill">Filled-in — Checkout API</button>
+    </div>
+    <div class="tab-panel active" data-panel="c4-tpl">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">mermaid</span></div>
+        <pre><code>C4Context
+System(main, "{Project Name}", "One-sentence description of what the system does")
+System_Ext(auth, "Auth Provider", "e.g. Auth0, Clerk, Supabase Auth")
+Rel(main, auth, "Authenticates via", "OAuth / OIDC")</code></pre>
+      </div>
+    </div>
+    <div class="tab-panel" data-panel="c4-fill">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">mermaid — filled in for a Checkout API</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>C4Context
+System(main, "Checkout API", "HTTP service that places and tracks customer orders")
+System_Ext(auth, "Auth0", "Hosted OAuth2 + OIDC identity provider")
+Rel(main, auth, "Verifies customer JWTs", "OIDC JWKS")</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <h3>Override mechanism — path-mirroring</h3>
+  <p>Drop your version at <code class="inline-cmd">custom-templates/&lt;same-path&gt;</code> (in the fork for single-fork, or in the private sibling repo for split-portfolio). The resolver <code class="inline-cmd">portfolio_resolve_template &lt;path&gt;</code> prefers your version; the framework default is ignored for that invocation. No frontmatter, no config table, no registry — discovery is the convention itself.</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">bash</span></div>
+    <pre><code># Override the PRD template (split-portfolio)
+cd ~/ops/apexyard-portfolio
+mkdir -p custom-templates/tickets
+cp ../apexyard/templates/tickets/feature.md custom-templates/tickets/feature.md
+$EDITOR custom-templates/tickets/feature.md   # own it in full
+git add custom-templates/tickets/feature.md
+git commit -m "chore: adopter PRD template override"</code></pre>
+  </div>
+</section>
+
+<!-- ===================== AgDRs ===================== -->
+<section id="agdr">
+  <h2>AgDRs — the decision memory</h2>
+  <p>An <strong>Agent Decision Record</strong> is the AI-era analog of an ADR. The portfolio has 81 of them, cross-searchable via <code class="inline-cmd">/agdr search &lt;term&gt;</code> across every managed project + the fork. The signature shape is a one-paragraph <strong>Y-statement</strong>:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">the Y-statement template</span></div>
+    <pre><code>In the context of {context}, facing {concern},
+I decided {decision} to achieve {goal}, accepting {tradeoff}.</code></pre>
+  </div>
+
+  <h3>The flow — file an AgDR, search before you decide</h3>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">terminal</span></div>
+    <pre><code># Before drafting a design, check whether this has been decided before
+/agdr search auth          # across the whole portfolio
+/agdr browse --category architecture
+/agdr show AgDR-0042
+
+# File a new one — interactive; writes docs/agdr/AgDR-NNNN-<slug>.md
+/decide "Use Zod for runtime request validation"</code></pre>
+  </div>
+
+  <h3>Real example — AgDR-0007 (release-cut branch model)</h3>
+  <p>Here's a real AgDR verbatim from the corpus, shortened only for layout:</p>
+  <details class="collapsible">
+    <summary>Read the full AgDR-0007</summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">docs/agdr/AgDR-0007-release-cut-branch-model.md</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>---
+id: AgDR-0007
+timestamp: 2026-04-25T03:50:00Z
+agent: claude
+model: claude-opus-4-7
+trigger: user-prompt
+status: executed
+---
+
+# Adopt release-cut branch model (dev + main + tags) for apexyard
+
+&gt; In the context of external adopters now making daily WIP pollute "the
+&gt; framework", facing the need for a predictable release promise without
+&gt; full git-flow ceremony, I decided to move daily work to `dev` and reserve
+&gt; `main` for tagged releases, accepting that contributors must retarget
+&gt; PRs and the release cadence must be curated.
+
+## Context
+apexyard started single-user (main = both working + consumed surface);
+adopters now sync via /update pulling upstream/main; drift detection is
+already tag-based; the framework is docs + hooks + skills (not a compiled
+artefact needing stabilisation windows).
+
+## Options Considered
+| Option | Pros | Cons |
+|--------|------|------|
+| A. Stay trunk-based | Zero change cost | Adopters pull WIP |
+| B. Trunk + tags only | /update still pulls main HEAD | Same problem |
+| C. Release-cut (dev + main + tags) | Clean release promise | Retarget PRs |
+| D. Full git flow | Soak window, multi-version | Overkill for docs+shell |
+
+## Decision
+Chosen: **Option C** — release-cut / "gitflow-lite". Clean release promise
+without ceremony; explicitly NOT git flow.
+
+## Consequences
+- Kept: existing hooks, tag-based drift, /update semantic upgrade
+- Added: dev as default PR target, release-PR flow, /release skill,
+  branch protection on main, block-main-push.sh extended to dev
+- Dropped: rolling-HEAD semantics on main
+- Non-consequences: managed projects stay trunk-based; no hotfix branches
+
+## Artifacts
+- Implementing ticket: me2resh/apexyard#116
+- /release skill
+- docs/release-process.md
+- CLAUDE.md + docs/multi-project.md</code></pre>
+      </div>
+    </div>
+  </details>
+
+  <div class="callout amber">
+    <div class="c-title">Live style drift — both forms co-exist</div>
+    <p>AgDR-0007 has YAML frontmatter (older style). Newer AgDRs (0018, 0050…) use <strong>body-H1 only, no frontmatter</strong>, because markdownlint MD025 trips on YAML-title + body H1 simultaneously. Recent ones carry a <code class="inline-cmd">**Metadata**</code> line instead. Both forms appear in the corpus; the live style is body-H1 only.</p>
+  </div>
+
+  <h3>AgDRs are mechanically enforced</h3>
+  <p>Two hooks gate architecture-touching work on AgDR linkage:</p>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Hook</th><th>Fires on</th><th>What it requires</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">require-agdr-for-arch-changes.sh</code></td><td><code class="inline-cmd">git commit *</code> touching arch files</td><td>Commit message references <code class="inline-cmd">AgDR-NNNN</code> or carries <code class="inline-cmd">&lt;!-- agdr: not-applicable --&gt;</code></td></tr>
+        <tr><td><code class="inline-cmd">require-agdr-for-arch-pr.sh</code></td><td><code class="inline-cmd">gh pr create *</code> with arch changes in the diff</td><td>PR body links an AgDR at <code class="inline-cmd">docs/agdr/AgDR-NNNN-*.md</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>The <code class="inline-cmd">&lt;!-- agdr: not-applicable --&gt;</code> escape hatch is the audited way to say "this diff misfired the heuristic" — the marker is grep-able in history.</p>
+</section>
+
+<!-- ===================== HANDBOOKS ===================== -->
+<section id="handbooks">
+  <h2>Handbooks — adopter coding standards consumed by Rex</h2>
+  <p>Handbooks are the adopter's coding standards. They live in <code class="inline-cmd">handbooks/</code> (public fork) and optionally <code class="inline-cmd">custom-handbooks/</code> (private sibling repo). Rex (and Tariq) discover them by <strong>path-convention</strong> — no YAML frontmatter required, no <code class="inline-cmd">applies_to:</code> glob.</p>
+
+  <h3>Discovery — the path IS the metadata</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Path</th><th>When Rex loads it</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">handbooks/architecture/*.md</code></td><td><strong>Always</strong> — architecture standards apply to every PR</td></tr>
+        <tr><td><code class="inline-cmd">handbooks/general/*.md</code></td><td><strong>Always</strong> — cross-cutting rules (commit msgs, comment density)</td></tr>
+        <tr><td><code class="inline-cmd">handbooks/language/&lt;lang&gt;/*.md</code></td><td>On diff match by extension: <code class="inline-cmd">typescript/</code> → <code class="inline-cmd">**/*.{ts,tsx}</code>, <code class="inline-cmd">python/</code> → <code class="inline-cmd">**/*.py</code>, etc.</td></tr>
+        <tr><td><code class="inline-cmd">handbooks/domain/&lt;area&gt;/*.md</code></td><td>On diff match via opt-in <code class="inline-cmd">paths:</code> YAML frontmatter (per AgDR-0037)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Advisory vs BLOCKING — the opt-in</h3>
+  <div class="grid cols-2">
+    <div class="card" style="border-left:3px solid var(--amber);">
+      <div class="card-num" style="color:var(--amber);">advisory (default)</div>
+      <h4>Rex surfaces as nit/suggestion</h4>
+      <p>PR can still merge if other gates pass. Use for rules where a violation has modest downstream cost.</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--red);">
+      <div class="card-num" style="color:var(--red);">BLOCKING (opt-in)</div>
+      <h4>Rex's verdict becomes request-changes</h4>
+      <p>Add <code class="inline-cmd">ENFORCEMENT: blocking</code> at the top of the file. The merge gate blocks until resolved. Use sparingly — for rules where a violation has material downstream cost (data loss, security incident, irreversible outage).</p>
+    </div>
+  </div>
+
+  <h3>The four framework-shipped samples</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Path</th><th>Type</th><th>Enforcement</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">architecture/clean-architecture-layers.md</code></td><td>Always-load</td><td>advisory</td></tr>
+        <tr><td><code class="inline-cmd">architecture/migration-safety.md</code></td><td>Always-load</td><td><strong>blocking</strong></td></tr>
+        <tr><td><code class="inline-cmd">language/typescript/strict-mode.md</code></td><td>Diff-matched</td><td>advisory</td></tr>
+        <tr><td><code class="inline-cmd">general/commit-message-quality.md</code></td><td>Always-load</td><td>advisory</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details class="collapsible">
+    <summary>The real <code class="inline-cmd">migration-safety.md</code> BLOCKING handbook (excerpt)</summary>
+    <div class="collapsible-body">
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">handbooks/architecture/migration-safety.md</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+        <pre><code>ENFORCEMENT: blocking
+
+# Handbook: Migration Safety
+
+**Scope:** all PRs (handbook lives under architecture/ — Rex always loads it).
+**Enforcement:** blocking — Rex requests changes if it detects a violation.
+
+## The rule
+Database schema migrations must be backwards-compatible for at least one
+release. A single migration MUST NOT do any of:
+- DROP COLUMN/TABLE on what the previous release reads/writes
+  (rolling-deploy crash window)
+- RENAME COLUMN/TABLE in a single step
+  (add copy → dual-write → drop, across releases)
+- ALTER COLUMN to more restrictive type/NOT NULL without a default
+- Drop/narrow an enum value the old code might emit
+- Reorder or change semantics without a feature flag
+
+## Why
+Production rollouts are not atomic. During a deploy window (30s–30min)
+both old and new code run against the same database. The "backwards-
+compatible for one release" rule converts every breaking change into a
+planned two-step over two releases. This pattern is slow on purpose.
+The slowness is the safety.
+
+## Sample finding
+&gt; ⛔ Migration safety — BLOCKING
+&gt; prisma/migrations/.../migration.sql drops users.role_v1. The previous
+&gt; release still reads this column in src/auth/role-resolver.ts:42. A
+&gt; rolling deploy crashes old instances on every login request during
+&gt; the window.
+&gt; Required fix: split into two PRs across two releases: this release
+&gt; stop reading role_v1; next release drop the column.
+
+## What's NOT a violation
+- Adding (additive) columns/tables/enum values
+- DROP on a column added+deprecated in a prior release
+- Pure data backfills with no schema change
+
+## Override
+Intentional violations must link a migration AgDR documenting the
+breaking change, why BW-compat is skipped, downtime/rollback plan,
+cross-service consumer list. With AgDR linked, Rex marks this check
+N/A — the AgDR is the audit trail.</code></pre>
+      </div>
+    </div>
+  </details>
+
+  <div class="callout">
+    <div class="c-title">Codify a Rex miss into a new handbook</div>
+    <p>If a review comment catches something Rex missed, run <code class="inline-cmd">/codify-rule</code>. The skill drafts a handbook entry from the comment, bucket-routes it (architecture / general / language), and adds a Y/N gate. The next PR touching that pattern gets the finding automatically.</p>
+  </div>
+</section>
+
+<!-- ===================== PIPELINES & TOPOLOGIES ===================== -->
+<section id="pipelines">
+  <h2>CI pipelines &amp; topologies</h2>
+
+  <h3>golden-paths/pipelines/ — 11 drop-in GitHub Actions</h3>
+  <p>Reusable workflow files you copy into your project's <code class="inline-cmd">.github/workflows/</code>. They're framework-agnostic — use whichever ones you need.</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">bash</span></div>
+    <pre><code># From your managed project's root (e.g. inside workspace/example-app/)
+mkdir -p .github/workflows
+cp ~/ops/apexyard/golden-paths/pipelines/security.yml .github/workflows/
+cp ~/ops/apexyard/golden-paths/pipelines/code-quality.yml .github/workflows/
+# OR use the combined pipeline:
+cp ~/ops/apexyard/golden-paths/pipelines/ci.yml .github/workflows/</code></pre>
+  </div>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>Pipeline</th><th>Purpose</th><th>Trigger</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">ci.yml</code></td><td>Combined — code-quality + security + dependencies + PR comment</td><td>Every PR</td></tr>
+        <tr><td><code class="inline-cmd">code-quality.yml</code></td><td>TypeScript, ESLint, tests, build (Rex-shaped)</td><td>Every PR</td></tr>
+        <tr><td><code class="inline-cmd">security.yml</code></td><td>Semgrep SAST + npm audit + TruffleHog secrets</td><td>Every PR, push to main</td></tr>
+        <tr><td><code class="inline-cmd">dependency-audit.yml</code></td><td>Weekly vulnerability + outdated + licence scan</td><td>Weekly cron, package changes</td></tr>
+        <tr><td><code class="inline-cmd">pr-title-check.yml</code></td><td>Enforce ticket ID in PR titles</td><td>Every PR</td></tr>
+        <tr><td><code class="inline-cmd">review-check.yml</code></td><td>Block merge if Rex hasn't reviewed the latest commit</td><td>Every PR + review event</td></tr>
+        <tr><td><code class="inline-cmd">swift-ci.yml</code></td><td>Swift Package Manager build + guarded tests (macOS)</td><td>Every PR</td></tr>
+        <tr><td><code class="inline-cmd">terraform-ci.yml</code></td><td>AWS Terramate — fmt/validate/tflint/tfsec → per-stack plan/apply</td><td>Every PR, push to main</td></tr>
+        <tr><td><code class="inline-cmd">macos-release.yml</code></td><td>Mac app: build → sign → notarize + staple → DMG → Release</td><td>Version tag, manual</td></tr>
+        <tr><td><code class="inline-cmd">seo-check.yml</code></td><td>SEO analysis (H1, meta, content length, alt text, links)</td><td>Content changes</td></tr>
+        <tr><td><code class="inline-cmd">auto-tag-on-release-pr-merge.yml</code></td><td>Auto-tag squash commit + GitHub Release on <code class="inline-cmd">release/v*</code> PR merge</td><td>PR closed (merged)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>topologies/ — per-service-shape harness bundles</h3>
+  <p>A <strong>topology</strong> is a common service shape (web app, API service, data pipeline) that ApexYard knows how to harness opinionatedly. Each bundles the primitives you'd otherwise reassemble by hand on every onboarding: handbooks, CI pipelines, and stack-specific AgDR templates. Picked during <code class="inline-cmd">/handover</code>.</p>
+  <div class="grid cols-3">
+    <div class="card"><div class="card-num">typescript-nextjs</div><h4>SaaS web app</h4><p>TS strict + Next.js conventions + Prisma ORM + Vercel. Handbooks for routing, auth, data loading. CI: typecheck + lint + test + build + bundle-size guard.</p></div>
+    <div class="card"><div class="card-num">python-fastapi</div><h4>HTTP service</h4><p>Python type hints + Pydantic + FastAPI. Handbooks for async correctness, dependency injection, exception handlers. JWT validation domain handbook.</p></div>
+    <div class="card"><div class="card-num">go-data-pipeline</div><h4>Batch/streaming pipeline</h4><p>Go's enforced error returns + module boundaries + stdlib-first. Handbooks for context propagation, goroutine lifecycle, error wrapping. Domain: checkpointing, at-least-once, observability, batching.</p></div>
+  </div>
+  <div class="callout">
+    <div class="c-title">If your stack doesn't match a topology</div>
+    <p>Run <code class="inline-cmd">/handover</code> without picking one — "Skip / custom" is the default and the existing flow works byte-for-byte. Topologies are opt-in convenience; v1 is framework-curated only (adopter-authored topologies are deferred to v2.1).</p>
+  </div>
+</section>
+
+<!-- ===================== BEST WAY ===================== -->
+<section id="best">
+  <h2>The best way to use it</h2>
+  <p>Concrete patterns drawn from the rule files, AgDRs, and the operational wisdom baked into the skills. These are the do/don't that separate a smooth ApexYard experience from fighting the gates.</p>
+
+  <h3>Do — the patterns that pay off</h3>
+
+  <h4>1. Use <code class="inline-cmd">/setup</code>, don't hand-edit <code class="inline-cmd">onboarding.yaml</code></h4>
+  <p>The skill is a 3-exchange interview that produces a consistent config, refuses to run without <code class="inline-cmd">jq</code>, offers the LSP install for your detected language, and writes the <code class="inline-cmd">.apexyard-fork</code> marker. Hand-editing misses the marker, the LSP offer, and the registry seeding. Run <code class="inline-cmd">/setup --reset</code> to re-run cleanly.</p>
+
+  <h4>2. One ticket at a time — it's not a style preference, it's a gate</h4>
+  <p>The <code class="inline-cmd">require-active-ticket.sh</code> hook writes a per-project marker when you run <code class="inline-cmd">/start-ticket</code>. If you start #6, then #7, then #8, the marker for #6 gets overwritten — and your PR (which the <code class="inline-cmd">validate-pr-create.sh</code> hook will refuse if it bundles multiple <code class="inline-cmd">Closes #N</code> lines without the escape marker) won't merge. The RIGHT pattern is the loop in the SDLC section above: <code class="inline-cmd">Start → PR → Review → QA → Done</code>, one ticket at a time.</p>
+
+  <h4>3. Get the AgDR <em>before</em> the architecture lands</h4>
+  <p>Run <code class="inline-cmd">/agdr search &lt;term&gt;</code> before drafting a design. If a prior AgDR covers your decision, reuse it — the <code class="inline-cmd">require-agdr-for-arch-pr.sh</code> hook will block your PR if you introduce a new pattern without linking one. If you're genuinely deciding something new, run <code class="inline-cmd">/decide</code> <em>during</em> the design phase, not after. The AgDR is the audit trail; writing it post-hoc during PR review is already too late.</p>
+
+  <h4>4. Pick the right early-work scaffold</h4>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>If you're asking…</th><th>Use</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td>"Will this technically work?"</td><td><code class="inline-cmd">/spike</code></td><td>Throwaway; exempt from AgDR + 80% coverage. <code class="inline-cmd">/spike-close --promote</code> or <code class="inline-cmd">--discard</code> when answered.</td></tr>
+        <tr><td>"What should it look and feel like?"</td><td><code class="inline-cmd">/prototype</code></td><td>Throwaway UX/demo. Same exemptions as /spike.</td></tr>
+        <tr><td>"Is the whole architecture wired end-to-end?"</td><td><code class="inline-cmd">/walking-skeleton</code></td><td>KEPT. Full SDLC, no exemptions. You grow the product on top of it.</td></tr>
+        <tr><td>"This bug resisted the obvious fix."</td><td><code class="inline-cmd">/bug</code> → <code class="inline-cmd">/debug</code></td><td>Forces architecture-first reading + evidence-before-fix. Don't use /debug for simple bugs — the ceremony exceeds the fix cost.</td></tr>
+        <tr><td>"Multi-session mystery / regression hunt."</td><td><code class="inline-cmd">/investigation</code></td><td>Live-doc workflow; cross-session continuity.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>Don't accidentally promote a throwaway into production — that confusion is exactly what the taxonomy exists to prevent.</p>
+
+  <h4>5. Use split-portfolio mode if you're on GitHub Free with any private project</h4>
+  <p>GitHub Free disallows changing a fork's visibility. If you start in single-fork mode and push private project names to your public fork, the <code class="inline-cmd">/split-portfolio</code> skill automates the destructive recovery flow (force-push main to remove the registry from history, redact Issue/PR bodies, move data to a private sibling repo). It's gated at every step but it's still destructive. Start in split-portfolio mode if you have anything private.</p>
+
+  <h4>6. Pull <code class="inline-cmd">opusplan</code> as the cost lever</h4>
+  <p>In-flow roles run on your primary tier (usually Opus) — that's why the main agent dominates token spend. The biggest cost win, with no framework change, is <code class="inline-cmd">opusplan</code>: Opus plans, Sonnet executes. Second lever: the thin-orchestrator pattern — keep the Opus loop as a planner/coordinator and delegate implementation to spawned <code class="inline-cmd">sonnet</code> build agents via <code class="inline-cmd">/fan-out</code> or <code class="inline-cmd">Workflow</code>. Third: populate <code class="inline-cmd">agent-routing.yaml</code> to pin per-agent tiers. See <code class="inline-cmd">docs/orchestrator-cost-model.md</code>.</p>
+
+  <h4>7. Get the per-PR CEO approval, not the plan-level "go"</h4>
+  <p>The merge gate rejects plan-level approval. Even after the CEO says "go" on a multi-step plan that includes a merge step, you MUST first execute the non-merge steps, then ask "PR #X ready to merge — approved?", get "approved", THEN invoke <code class="inline-cmd">/approve-merge X</code>. The <code class="inline-cmd">block-unreviewed-merge.sh</code> hook checks for a structured CEO marker with <code class="inline-cmd">approved_by=user</code> and <code class="inline-cmd">skill_version &gt;= 2</code> — bare-SHA legacy markers are rejected.</p>
+
+  <h4>8. Let <code class="inline-cmd">/handover</code> score your repo before the first review</h4>
+  <p>If the 5-dimension harnessability score comes back "low" on test coverage or lint baseline, Rex's blocking handbooks (especially <code class="inline-cmd">migration-safety.md</code>) will false-positive. Either tighten the codebase first, or relax the offending handbook to advisory (<code class="inline-cmd">ENFORCEMENT: blocking</code> → remove the line) before the first review. The score is a forecast; use it.</p>
+
+  <h3>Don't — the patterns that bite</h3>
+
+  <h4>1. Don't cargo-cult the dev/main split into managed projects</h4>
+  <p>The release-cut branch model (dev daily trunk, main release-only) is <strong>framework-only</strong>. Managed projects under ApexYard governance stay <strong>trunk-based</strong> — PRs merge to <code class="inline-cmd">main</code> directly because they have no downstream consumers. The <code class="inline-cmd">/release</code> skill is the only piece that's framework-specific and refuses to run on a managed project. Don't push the dev/main split into project templates, scaffolds, or <code class="inline-cmd">/handover</code> output.</p>
+
+  <h4>2. Don't <code class="inline-cmd">git add -A</code> / <code class="inline-cmd">git add .</code></h4>
+  <p>The <code class="inline-cmd">block-git-add-all.sh</code> hook hard-blocks both. Staging must be explicit — stage specific files. This is the leak-protection backstop: it prevents a filled-in <code class="inline-cmd">onboarding.yaml</code> or a stray <code class="inline-cmd">.env</code> from riding along in a <code class="inline-cmd">git add -A</code>.</p>
+
+  <h4>3. Don't auto-close tickets with <code class="inline-cmd">Closes #N</code> when QA verification is required</h4>
+  <p>When a merged PR needs QA verification, use <code class="inline-cmd">Refs #42</code> + the <code class="inline-cmd">qa</code> label, NOT <code class="inline-cmd">Closes #42</code>. The QA gate is mandatory — a merged PR is never Done until Salim has verified every acceptance criterion. Auto-closing via <code class="inline-cmd">Closes #XX</code> is intentionally overridden.</p>
+
+  <h4>4. Don't hand-merge <code class="inline-cmd">upstream/main</code></h4>
+  <p>Run <code class="inline-cmd">/update</code>. It's a 10-step flow (see <a href="#upgrading">Upgrading</a> for the full breakdown): preview, sync branch, merge/rebase, conflict resolution, deprecated-config detection, split-portfolio v1→v2 offer, the per-version migration chain, topology drift — then leaves a branch ready to push. Hand-merging skips the migration chain (shipped since v1.4.0) and you'll discover the breakage mid-skill. And don't reach for <code class="inline-cmd">--from-dev</code> casually — it's hidden on purpose; the adopter contract is tagged releases.</p>
+
+  <h4>5. Don't push to <code class="inline-cmd">main</code> or <code class="inline-cmd">dev</code> directly</h4>
+  <p><code class="inline-cmd">block-main-push.sh</code> blocks it. Every change goes through a PR. This applies to the framework fork (dev + main) AND to managed projects (main). The only exceptions are release PRs (framework) and the narrow branch-name allowlist (<code class="inline-cmd">release/v*</code>, <code class="inline-cmd">sync/main-to-dev-after-*</code>).</p>
+
+  <h3>The 5 most common "why am I blocked?" recipes</h3>
+  <div class="tbl-wrap">
+    <table class="tbl-compact">
+      <thead><tr><th>You see</th><th>What's missing</th><th>Fix</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline-cmd">BLOCKED: No active ticket set for this session.</code></td><td>A ticket marker for the repo you're editing</td><td><code class="inline-cmd">gh issue create …</code> then <code class="inline-cmd">/start-ticket &lt;N&gt;</code></td></tr>
+        <tr><td><code class="inline-cmd">BLOCKED: Branch 'X' doesn't follow naming convention.</code></td><td>Branch isn't <code class="inline-cmd">{type}/{TICKET}-{desc}</code></td><td><code class="inline-cmd">git branch -m X feature/GH-42-description</code></td></tr>
+        <tr><td><code class="inline-cmd">BLOCKED: PR #N has no recorded code-reviewer (Rex) approval.</code></td><td>Rex hasn't reviewed (or reviewed an old SHA)</td><td><code class="inline-cmd">/code-review N</code> — re-invoke on the latest HEAD</td></tr>
+        <tr><td><code class="inline-cmd">BLOCKED: PR #N has Rex approval but no CEO approval marker.</code></td><td>No per-PR CEO nod (plan "go" doesn't count)</td><td>Ask "PR #N ready to merge — approved?", on "approved" run <code class="inline-cmd">/approve-merge N</code></td></tr>
+        <tr><td><code class="inline-cmd">BLOCKED: No active ticket set — and this file looks like a database migration.</code></td><td>No migration ticket + AgDR</td><td><code class="inline-cmd">/migration</code> (creates both), then <code class="inline-cmd">/start-ticket &lt;N&gt;</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===================== UPGRADING & COMMUNITY ===================== -->
+<section id="upgrading">
+  <h2>Upgrading &amp; community</h2>
+
+  <h3>Keeping your fork current</h3>
+  <p>Run <code class="inline-cmd">/update</code>. It's the single-command replacement for the manual "fetch → branch → merge → push → PR" dance. It previews the upstream diff, merges on a sync branch (never directly on <code class="inline-cmd">main</code> — <code class="inline-cmd">block-main-push.sh</code> blocks that), handles conflicts one file at a time, detects deprecated config keys, offers the split-portfolio v1→v2 migration, walks the per-version migration chain, checks topology drift, and leaves a sync branch ready to push. A <code class="inline-cmd">SessionStart</code> drift banner tells you when a new tag is available — you won't forget for 6 months.</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">terminal</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+    <pre><code>/update                              # merge-based sync (default, safer)
+/update --rebase                     # rebase local customisations on top of upstream
+/update --dry-run                    # preview only, don't touch anything
+/update --from-version v1.2.0         # override the version anchor (when missing/stale)
+/update --skip-migrations            # files-only sync; skip the per-version chain
+/update --from-dev                   # (hidden) pull from upstream/dev — pre-release; expect breakage</code></pre>
+  </div>
+
+  <div class="callout amber">
+    <div class="c-title"><code class="inline-cmd">--from-dev</code> is hidden on purpose</div>
+    <p>The adopter contract is <strong>tagged releases from <code class="inline-cmd">upstream/main</code></strong> (release-cut model, AgDR-0007). <code class="inline-cmd">--from-dev</code> pulls pre-release work and is deliberately omitted from the skill's <code class="inline-cmd">description</code> frontmatter so <code class="inline-cmd">/help</code> doesn't surface it — it IS in <code class="inline-cmd">## Usage</code> and <code class="inline-cmd">## Options</code> for operators who read the spec. When used, it prints a <code class="inline-cmd">⚠ PRE-RELEASE SYNC</code> banner BEFORE any <code class="inline-cmd">git fetch</code> so the deal is restated every invocation, and the migration chain auto-skips (pre-release has no tag to anchor against). Use cases: the framework maintainer testing pre-release work on another machine; adopters validating an upcoming change before the wider rollout.</p>
+  </div>
+
+  <details class="collapsible">
+    <summary>The full <code class="inline-cmd">/update</code> process — 10 steps</summary>
+    <div class="collapsible-body">
+      <p>Drawn from <code class="inline-cmd">.claude/skills/update/SKILL.md</code>. Each step is a gate — on first failure, the skill stops and explains.</p>
+      <div class="tbl-wrap">
+        <table class="tbl-compact">
+          <thead><tr><th>Step</th><th>What happens</th></tr></thead>
+          <tbody>
+            <tr><td>Pre</td><td>Parse flags, print the <code class="inline-cmd">⚠ PRE-RELEASE SYNC</code> banner if <code class="inline-cmd">--from-dev</code>, resolve <code class="inline-cmd">UPSTREAM_REF</code> + branch suffix once</td></tr>
+            <tr><td>0</td><td>Write <code class="inline-cmd">.claude/session/active-bootstrap</code> so the ticket-first hook exempts this skill (it's on the default <code class="inline-cmd">bootstrap_skills</code> list)</td></tr>
+            <tr><td>1</td><td>Pre-flight: <code class="inline-cmd">upstream</code> remote exists, working tree clean, on default branch</td></tr>
+            <tr><td>2</td><td><code class="inline-cmd">git fetch upstream --quiet</code> + <code class="inline-cmd">git fetch origin --quiet</code> (one fetch covers both main and dev)</td></tr>
+            <tr><td>3</td><td>Preview: compare <code class="inline-cmd">UPSTREAM_TAG</code> vs <code class="inline-cmd">LOCAL_TAG</code>, list ahead/behind commits, default-Y when a real release is available, default-N for main-only drift</td></tr>
+            <tr><td>4</td><td>Ask merge vs rebase (unless <code class="inline-cmd">--rebase</code> passed). Merge is default — preserves local customisation SHAs.</td></tr>
+            <tr><td>5</td><td>Create sync branch <code class="inline-cmd">chore/#N-sync-upstream-apexyard</code> (or <code class="inline-cmd">-sync-upstream-dev</code> under <code class="inline-cmd">--from-dev</code>) — never merge on main; <code class="inline-cmd">block-main-push.sh</code> blocks commits on main</td></tr>
+            <tr><td>6</td><td><code class="inline-cmd">git merge "$UPSTREAM_REF" --no-edit</code> (or <code class="inline-cmd">git rebase "$UPSTREAM_REF"</code>)</td></tr>
+            <tr><td>7</td><td>Conflicts: per-file prompt — (1) keep mine, (2) accept upstream, (3) open editor. Default (3); auto-resolution on a governance framework is risky.</td></tr>
+            <tr><td>8</td><td>Detect deprecated config keys (advisory, y/n/s offer — custom extension keys can't be distinguished from upstream-removed ones)</td></tr>
+            <tr><td>8a</td><td>Offer split-portfolio v1→v2 migration if detected (advisory, default-yes, per-file-class confirmable, idempotent)</td></tr>
+            <tr><td>8b</td><td>Walk the per-version migration chain — see below</td></tr>
+            <tr><td>8c</td><td>Topology drift detection (advisory, default-skip, per-file y/n/d/s)</td></tr>
+            <tr><td>9</td><td>Final state + next steps: prints the push command, an auto-generated PR body, and the fast-forward command. The skill does NOT push.</td></tr>
+            <tr><td>10</td><td>Edge cases table (no upstream remote, dirty tree, network failure, <code class="inline-cmd">--from-dev</code> but no <code class="inline-cmd">upstream/dev</code>, etc.)</td></tr>
+            <tr><td>Cleanup</td><td><code class="inline-cmd">rm -f .claude/session/active-bootstrap</code> — always, on clean exit or abort. Stale markers swept by <code class="inline-cmd">clear-bootstrap-marker.sh</code> at next SessionStart.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The skill never runs Rex or <code class="inline-cmd">/approve-merge</code> automatically — the sync branch is "ready to push", and the operator owns the PR + merge approval like any other change.</p>
+    </div>
+  </details>
+
+  <details class="collapsible">
+    <summary>The per-version migration chain (step 8b) — real example</summary>
+    <div class="collapsible-body">
+      <p>When an adopter jumps multiple releases at once (e.g. v1.0.0 → v1.4.0), the chain walker reads <code class="inline-cmd">.claude/framework-version</code> (the version anchor), compares against the latest upstream tag, builds the ordered list of pairs, and offers each migration with a <code class="inline-cmd">[Y / n / show-diff / skip-all]</code> prompt. Design rationale: AgDR-0032.</p>
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">terminal — a 3-step chain</span></div>
+        <pre><code>Per-version migration chain (3 steps):
+  1. v1.0.0 → v1.1.0   (.claude/migrations/v1.0.0-to-v1.1.0.sh)
+  2. v1.1.0 → v1.2.0   (.claude/migrations/v1.1.0-to-v1.2.0.sh)
+  3. v1.2.0 → v1.3.0   (.claude/migrations/v1.2.0-to-v1.3.0.sh)
+
+Each step is operator-confirmable. You can skip any individual step,
+skip the rest with `skip-all`, or see the script with `show-diff`.
+
+Step 1/3 — v1.0.0-to-v1.1.0
+  Script: .claude/migrations/v1.0.0-to-v1.1.0.sh
+  Lines:  42
+
+[Y] apply (run the script)
+[n] skip this step (advance anchor anyway)
+[d] show-diff (print the script body, then re-prompt y/n)
+[a] skip-all remaining steps</code></pre>
+      </div>
+      <p>Exit-code contract per migration script: <code class="inline-cmd">0</code> applied, <code class="inline-cmd">1</code> conflict needs operator (chain pauses, anchor NOT advanced), <code class="inline-cmd">2</code> hard error (chain aborts). If the anchor file is missing (legacy fork pre-v1.4.0) AND <code class="inline-cmd">--from-version</code> wasn't passed, the skill prompts interactively with a menu of known versions — default is the second-newest tag.</p>
+      <div class="callout">
+        <div class="c-title">Why a file anchor, not a derived signal</div>
+        <p>The version anchor is a standalone one-line file <code class="inline-cmd">.claude/framework-version</code>, not a key in <code class="inline-cmd">project-config.json</code> and not derived from the last merge-from-upstream commit. Derived signals are fragile under squash-merge and rebase; mixing a measured fact into configured facts invites drift on copy/paste. /update owns the file.</p>
+      </div>
+    </div>
+  </details>
+
+  <details class="collapsible">
+    <summary>Split-portfolio v1→v2 auto-migration (step 8a) — what it moves</summary>
+    <div class="collapsible-body">
+      <p>If <code class="inline-cmd">/update</code> detects a pre-v2 split-portfolio fork (has a <code class="inline-cmd">portfolio:</code> block but no <code class="inline-cmd">.apexyard-fork</code> marker), it offers the migration. Per AgDR-0021 § H: <code class="inline-cmd">onboarding.yaml</code> is <strong>COPIED</strong> (small file, snapshot kept as legacy fallback); <code class="inline-cmd">workspace/</code> is <strong>MOVED</strong> (gigabytes, no duplication).</p>
+      <div class="codeblock">
+        <div class="code-header"><span class="lang">terminal</span></div>
+        <pre><code>ApexYard /update detected your fork is in split-portfolio mode (v1 layout):
+
+  - apexyard.projects.yaml     → resolved to a sibling private repo (good)
+  - projects/                  → resolved to a sibling private repo (good)
+  - onboarding.yaml            → still in this public fork (v1 layout)
+  - workspace/                 → still in this public fork (v1 layout)
+
+Migrate now? This will:
+  - COPY onboarding.yaml to the sibling private repo (sibling becomes canonical)
+  - MOVE workspace/&lt;name&gt;/ contents to the sibling private repo
+  - Add gitignore entries for both in the public fork
+  - Write a .apexyard-fork marker (the v2 ops-fork anchor)
+  - Add portfolio.{onboarding,workspace_dir} keys to .claude/project-config.json
+
+[Y / n / dry-run — show commands, don't execute]</code></pre>
+      </div>
+      <p>Per-file-class confirmation — you can migrate <code class="inline-cmd">onboarding.yaml</code> and defer <code class="inline-cmd">workspace/</code>. Idempotent — re-running on a v2 layout is a no-op. The skill never commits — staging is the contract; you own both the public-fork commit AND the sibling-repo commit.</p>
+    </div>
+  </details>
+
+  <h3>The re-fork escape hatch</h3>
+  <p>If your fork has drifted too far to merge cleanly, re-fork and keep your data: in split-portfolio mode your registry, per-project docs, onboarding config, and workspace clones all live in the private sibling repo. Re-fork the public framework, point the <code class="inline-cmd">portfolio:</code> config block at the same sibling, and you're back. Single-fork adopters can <code class="inline-cmd">/split-portfolio</code> first to get to that safe state.</p>
+
+  <h3>Contributing to the framework itself</h3>
+  <p>ApexYard runs on its own rules — the flow mirrors any project under ApexYard governance:</p>
+  <div class="codeblock">
+    <div class="code-header"><span class="lang">bash</span></div>
+    <pre><code># Branch off dev (NOT main) — the framework uses release-cut
+git checkout -b feature/GH-42-short-slug upstream/dev
+
+# Make the change. Run the same checks CI runs:
+bash bin/run-hook-tests.sh       # ~65 hook/behaviour tests — must be green
+npx markdownlint-cli2 '**/*.md'  # if you touched markdown
+shellcheck .claude/hooks/*.sh    # if you touched hooks
+
+# Open a PR targeting dev
+gh pr create --base dev --fill</code></pre>
+  </div>
+  <p>If your change introduces a library, pattern, or architectural choice, add an AgDR at <code class="inline-cmd">docs/agdr/AgDR-NNNN-&lt;slug&gt;</code> and reference it in the PR. Rex + a maintainer review every PR before merge. New commits after a review re-trigger it.</p>
+
+  <h3>Framework feedback skills</h3>
+  <div class="grid cols-2">
+    <div class="card"><div class="card-num">/report-apexyard-bug</div><h4>Report a framework bug upstream</h4><p>Files a structured issue to <code class="inline-cmd">me2resh/apexyard</code> (leak-scrubbed). Distinct from <code class="inline-cmd">/bug</code>, which files into your own managed project.</p></div>
+    <div class="card"><div class="card-num">/request-apexyard-feature</div><h4>Request a framework feature upstream</h4><p>Files a structured feature request to <code class="inline-cmd">me2resh/apexyard</code>. Distinct from <code class="inline-cmd">/feature</code>.</p></div>
+  </div>
+
+  <div class="callout amber">
+    <div class="c-title">Security issues</div>
+    <p>Do NOT open a public issue for security problems. See <code class="inline-cmd">SECURITY.md</code> for private disclosure via GitHub security advisories.</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  <p>ApexYard is MIT-licensed, plain markdown + shell — no build step, no SaaS, no lock-in.</p>
+  <p>Source: <a href="https://github.com/me2resh/apexyard">github.com/me2resh/apexyard</a> · Site: <a href="https://yard.apexscript.com">yard.apexscript.com</a> · Docs: <a href="https://github.com/me2resh/apexyard/tree/main/docs">/docs</a></p>
+  <p style="margin-top:12px;">This explainer was generated from the v4.3.0 codebase. Real examples (BLOCKED messages, marker formats, AgDR content) are quoted verbatim from the framework files.</p>
+</footer>
+
+<script>
+// Theme toggle (persisted)
+function toggleTheme() {
+  var html = document.documentElement;
+  var cur = html.getAttribute('data-theme');
+  var next = (cur === 'dark') ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  try { localStorage.setItem('ay-theme', next); } catch(e) {}
+  updateToggleLabel();
+}
+function updateToggleLabel() {
+  var cur = document.documentElement.getAttribute('data-theme');
+  var btn = document.querySelector('.theme-toggle');
+  if (btn) btn.textContent = (cur === 'dark') ? '☀ Light' : '☾ Dark';
+}
+(function() {
+  var saved = null;
+  try { saved = localStorage.getItem('ay-theme'); } catch(e) {}
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    document.documentElement.setAttribute('data-theme', 'dark');
+  updateToggleLabel();
+})();
+
+// Tab panels
+document.querySelectorAll('.tab-bar button').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var tab = btn.getAttribute('data-tab');
+    var tabs = btn.closest('.tabs');
+    tabs.querySelectorAll('.tab-bar button').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    tabs.querySelectorAll('.tab-panel').forEach(function(p) {
+      p.classList.toggle('active', p.getAttribute('data-panel') === tab);
+    });
+  });
+});
+
+// Copy-to-clipboard on code blocks (button calls copyCode(this))
+function copyCode(btn) {
+  var block = btn.closest('.codeblock');
+  if (!block) return;
+  var code = block.querySelector('pre code') || block.querySelector('pre');
+  if (!code) return;
+  var text = code.innerText;
+  var done = function() {
+    btn.classList.add('copied');
+    btn.textContent = 'Copied';
+    setTimeout(function() { btn.classList.remove('copied'); btn.textContent = 'Copy'; }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, function() { fallbackCopy(text); done(); });
+  } else { fallbackCopy(text); done(); }
+}
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+}
+
+// Scroll-spy TOC
+(function() {
+  var links = document.querySelectorAll('nav.toc a');
+  var map = {};
+  links.forEach(function(a) { map[a.getAttribute('href').slice(1)] = a; });
+  var sections = [];
+  Object.keys(map).forEach(function(id) {
+    var s = document.getElementById(id);
+    if (s) sections.push({ id: id, el: s, link: map[id] });
+  });
+  if (!('IntersectionObserver' in window) || !sections.length) return;
+  var observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) {
+        sections.forEach(function(s) { s.link.classList.remove('active'); });
+        var match = sections.filter(function(s) { return s.el === e.target; })[0];
+        if (match) match.link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+  sections.forEach(function(s) { observer.observe(s.el); });
+})();
+</script>
+
+</body>
+</html>
+
+
+
+
+
